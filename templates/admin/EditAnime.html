@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Anime</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0f151c;
+            --bg-transparente: #0f151cc2;
+            --box-shadow: #121921;
+            --color-back: #000000;
+            --color-border: rgba(209, 213, 219, 0.3);
+            --color-letra_primario: #d5d5d5;
+            --color-naranja: #ff6347;
+            --color-letra_secundario: #e4e4e4;
+            --color-letra_titulo: #3dd9ff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--color-letra_primario);
+        }
+
+        .form-container {
+            background-color: var(--bg-transparente);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 15px var(--box-shadow);
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .form-label {
+            color: var(--color-letra_secundario);
+        }
+
+        .form-control, .form-select {
+            background-color: var(--color-back);
+            border: 1px solid var(--color-border);
+            color: var(--color-letra_primario);
+        }
+
+        .btn-primary {
+            background-color: var(--color-naranja);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #e5533a;
+        }
+
+        .titulo {
+            color: var(--color-letra_titulo);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .img-preview {
+            max-width: 200px;
+            height: auto;
+            border: 1px solid var(--color-border);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2 class="titulo">Editar Anime</h2>
+        <form method="POST" enctype="multipart/form-data">
+
+            <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input type="text" name="titulo" class="form-control" value="{{ anime.titulo }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea name="descripcion" class="form-control" rows="4" required>{{ anime.descripcion }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Género</label>
+                <input type="text" name="genero" class="form-control" value="{{ anime.genero }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Fecha de Estreno</label>
+                <input type="date" name="fecha_estreno" class="form-control" value="{{ anime.fecha_estreno }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Estado</label>
+                <select name="estado" class="form-select" required>
+                    <option value="En emisión" {% if anime.estado == 'En emisión' %}selected{% endif %}>En emisión</option>
+                    <option value="Finalizado" {% if anime.estado == 'Finalizado' %}selected{% endif %}>Finalizado</option>
+                    <option value="Próximamente" {% if anime.estado == 'Próximamente' %}selected{% endif %}>Próximamente</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Portada Actual</label><br>
+                <img src="{{ anime.portada }}" alt="Portada del anime" class="img-preview">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Nueva Portada (opcional)</label>
+                <input type="file" name="portada" class="form-control">
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

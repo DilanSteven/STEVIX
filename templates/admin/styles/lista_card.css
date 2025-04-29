@@ -1,0 +1,21 @@
+:root {
+    --bg-color: #0f151c;
+    --bg-transparente: #0f151cc2;
+    --box-shadow: #121921;
+    --color-back: #000000;
+    --color-border: rgba(209, 213, 219, 0.3);
+    --color-letra_primario: #d5d5d5;
+    --color-naranja: #ff6347;
+    --color-letra_secundario: #e4e4e4;
+    --color-letra_titulo:#3dd9ff;
+  }
+  body{
+    background-color: var(--bg-color);
+  }
+.card{
+    background-color: var(--bg-transparente) ;
+    border: 1px solid var(--color-back) ;
+}
+.card-body{
+    color: var(--color-letra_primario) !important;
+}

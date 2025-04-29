@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Película</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f151c;
+            --text-color: #ffffff;
+            --accent-color: #0058d4;
+            --font-family: "Open Sans", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #1d252f;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h2 {
+            color: var(--accent-color);
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            color: var(--text-color);
+        }
+
+        .form-control {
+            background-color: #2a343f;
+            color: var(--text-color);
+            border: 1px solid #444d56;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(0, 88, 212, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #004aad;
+            border-color: #004aad;
+        }
+
+        .text-center {
+            color: var(--text-color);
+        }
+
+        .text-center a {
+            color: var(--accent-color);
+        }
+
+        .form-control-file {
+            background-color: #2a343f;
+            border: 1px solid #444d56;
+        }
+
+        /* Estilo para la animación de carga */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Mensajes de éxito y error */
+        .alert {
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <!-- Animación de carga -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="form-container">
+        <h2 class="text-center">Agregar Nueva Película</h2>
+
+        <!-- Mensaje de éxito/error -->
+        {% if success %}
+        <div class="alert alert-success">
+            ¡Película guardada correctamente!
+        </div>
+        {% elif error %}
+        <div class="alert alert-danger">
+            Hubo un error al guardar la película. Intenta nuevamente.
+        </div>
+        {% endif %}
+
+        <form id="formularioPelicula" action="/NewPeli" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="anime_id" class="form-label">ID de Anime</label>
+                <select class="form-control" id="anime_id" name="anime_id" required>
+                    <option value="">Selecciona un Anime</option>
+                    {% for anime in anime_ids %}
+                        <option value="{{ anime[0] }}">{{ anime[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="titulo" class="form-label">Título</label>
+                <input type="text" class="form-control" id="titulo" name="titulo" required placeholder="Ingresa el título de la película">
+            </div>
+            <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción</label>
+                <textarea class="form-control" id="descripcion" name="descripcion" rows="3" placeholder="Descripción de la película"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="fecha_estreno" class="form-label">Fecha de Estreno</label>
+                <input type="date" class="form-control" id="fecha_estreno" name="fecha_estreno" required>
+            </div>
+            <div class="mb-3">
+                <label for="duracion" class="form-label">Duración (en minutos)</label>
+                <input type="number" class="form-control" id="duracion" name="duracion" required placeholder="Duración de la película en minutos">
+            </div>
+            <div class="mb-3">
+                <label for="portada" class="form-label">Portada (Imagen)</label>
+                <input type="file" class="form-control-file" id="portada" name="portada" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Guardar Película</button>
+        </form>
+    </div>
+
+    <script>
+        // Mostrar animación de carga al enviar el formulario
+        const formulario = document.getElementById('formularioPelicula');
+        const loader = document.getElementById('loader');
+
+        formulario.addEventListener('submit', function () {
+            loader.style.display = 'block'; // Mostrar el loader
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+{% include 'admin/navbar_lateral.html' %}
+
+<div class="container py-5">
+  <h2 class="text-light mb-4">Editar capítulo</h2>
+  <form method="POST" class="bg-dark p-4 rounded text-white">
+    <div class="mb-3">
+      <label for="temporada_id" class="form-label">Temporada</label>
+      <select name="temporada_id" class="form-select" required>
+        <option value="">Selecciona una temporada</option>
+        {% for t in temporadas %}
+          <option value="{{ t[0] }}" {% if t[0] == capitulo['temporada_id'] %}selected{% endif %}>{{ t[1] }} - {{ t[2] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="numero_capitulo" class="form-label">Número de Capítulo</label>
+      <input type="number" name="numero_capitulo" class="form-control" value="{{ capitulo['numero_capitulo'] }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="titulo" class="form-label">Título</label>
+      <input type="text" name="titulo" class="form-control" value="{{ capitulo['titulo'] }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="descripcion" class="form-label">Descripción</label>
+      <textarea name="descripcion" class="form-control" rows="3">{{ capitulo['descripcion'] }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label for="fecha_emision" class="form-label">Fecha de Emisión</label>
+      <input type="date" name="fecha_emision" class="form-control" value="{{ capitulo['fecha_emision'] }}">
+    </div>
+    <div class="mb-3">
+      <label for="duracion" class="form-label">Duración (minutos)</label>
+      <input type="text" name="duracion" class="form-control" value="{{ capitulo['duracion'] }}">
+    </div>
+    <div class="mb-3">
+      <label for="link" class="form-label">Link</label>
+      <input type="text" name="link" class="form-control" value="{{ capitulo['link'] }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+  </form>
+</div>
+

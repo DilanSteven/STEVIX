@@ -1,0 +1,88 @@
+{% include 'sitio/navbar.html' %}
+
+
+
+<!-- Sección Estrenos 2025 -->
+<div id="estrenos2025" class="container py-5">
+  <h2 class="text-light mb-4">Animes estrenados en 2025</h2>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+    {% for anime in animes %}
+    <div class="col">
+      <div class="card h-100 bg-dark text-white border-0 shadow">
+        <img src="{{ anime.portada }}" class="card-img-top" alt="{{ anime.titulo }}"
+          style="height: 350px; object-fit: cover;">
+        <div class="card-body">
+          <h5 class="card-title">{{ anime.titulo }}</h5>
+          <p class="card-text">{{ anime.descripcion if anime.descripcion else "Descripción no disponible" }}</p>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a href="{{ url_for('ViewPeli', id=anime.id) }}" class="btn btn-outline-light w-100">Ver más</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Resultados de búsqueda -->
+<div id="resultadosBusqueda" class="container mt-4"></div>
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('buscador');
+    const resultadosDiv = document.getElementById('resultadosBusqueda');
+    const estrenosDiv = document.getElementById('estrenos2025');
+
+    input.addEventListener('keyup', function () {
+      const query = input.value.trim();
+
+      if (query.length === 0) {
+        resultadosDiv.innerHTML = '';
+        estrenosDiv.style.display = 'block';
+        return;
+      }
+
+      estrenosDiv.style.display = 'none';
+
+      fetch(`/api/buscar-animes?titulo=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.length === 0) {
+            resultadosDiv.innerHTML = '<h5 class="text-light text-center">No se encontraron resultados.</h5>';
+            return;
+          }
+
+          let html = '<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">';
+          data.forEach(item => {
+            const url = item.tipo === 'pelicula'
+              ? `/pelicula/${item.id}`
+              : `/anime/${item.id}/ver_capitulos`;
+
+            html += `
+              <div class="col">
+                <div class="card h-100 bg-dark text-white border-0 shadow">
+                  <img src="${item.portada}" class="card-img-top" alt="${item.titulo}" style="height: 350px; object-fit: cover;">
+                  <div class="card-body">
+                    <h5 class="card-title">${item.titulo}</h5>
+                    <p class="card-text">${item.descripcion || "Descripción no disponible"}</p>
+                  </div>
+                  <div class="card-footer bg-transparent border-0">
+                    <a href="${url}" class="btn btn-outline-light w-100">Ver más</a>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          html += '</div>';
+          resultadosDiv.innerHTML = html;
+        });
+    });
+  });
+</script>
+
+
+
+{% include 'sitio/footer.html' %}

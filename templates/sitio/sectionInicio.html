@@ -1,0 +1,124 @@
+
+ <!-- Sección Principal -->
+ <section class="inicio position-relative overflow-hidden">
+    <!-- Aquí reemplazamos la URL de la imagen con la proporcionada -->
+    <img src="{{ portada_inicio }}" alt="Imagen de inicio" id="Imagenportada" class="imagen-inicio">
+</section>
+
+<!-- Agregar Bootstrap JS y dependencias -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Función para obtener el color de los píxeles de la parte inferior de la imagen
+    function getBottomColor(image) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        ctx.drawImage(image, 0, 0, image.width, image.height);
+        const imageData = ctx.getImageData(0, canvas.height * 0.9, canvas.width, canvas.height * 0.1);
+        
+        let r = 0, g = 0, b = 0;
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+        }
+
+        const pixelCount = data.length / 4;
+        r = Math.floor(r / pixelCount);
+        g = Math.floor(g / pixelCount);
+        b = Math.floor(b / pixelCount);
+
+        return { r, g, b };
+    }
+
+    // Función para calcular el brillo del color
+    function getBrightness(r, g, b) {
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b; // Fórmula de luminancia
+    }
+
+    // Función para actualizar el color de fondo y el color de la letra al hacer scroll
+    window.addEventListener('scroll', () => {
+        const image = document.querySelector('.imagen-inicio');
+        const scrollPosition = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const percentageScrolled = scrollPosition / maxScroll;
+
+        const color = getBottomColor(image);
+        const brightness = getBrightness(color.r, color.g, color.b);
+
+        const darknessFactor = Math.min(1, percentageScrolled + 0.9);
+        const r = Math.floor(color.r * (1 - darknessFactor * 0.7) + 5);
+        const g = Math.floor(color.g * (1 - darknessFactor * 0.7));
+        const b = Math.floor(color.b * (1 - darknessFactor * 0.7) - 5);
+
+        // Calculamos el color de texto según el brillo del fondo
+        const textColor = brightness > 128 ? 'black' : 'white';
+
+        document.body.style.background = `rgb(${r}, ${g}, ${b})`;
+
+        // Cambiar color de texto
+        document.body.style.color = textColor;
+
+        const gradient = `linear-gradient(to bottom, rgba(${r}, ${g}, ${b}, 0.8) 80%, transparent 100%)`;
+
+        document.querySelector('.imagen-inicio').style.maskImage = gradient;
+        document.querySelector('.imagen-inicio').style.webkitMaskImage = gradient;
+    });
+</script>
+<style>
+
+   
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body, html {
+        height: 100%;
+        font-family: Arial, sans-serif;
+        transition: background-color 0.1s linear, color 0.1s linear; /* Suaviza la transición del color */
+    }
+
+    .inicio {
+        height: 70vh;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        filter: contrast(1);
+    }
+
+    .imagen-inicio {
+        width: 100%;
+        height: 600px;
+        max-height: 100%;
+        object-fit: fill;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+    /* Estilo adicional para hacer que la sección principal ocupe toda la altura de la ventana */
+    .inicio {
+        height: 70vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    @media (max-width: 767px) {
+    #Imagenportada {
+        height: auto !important;
+        object-fit: cover;
+    }
+    .inicio{
+        height: 30vh !important;
+    }
+}
+</style>

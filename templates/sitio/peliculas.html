@@ -1,0 +1,70 @@
+{% include 'sitio/navbar.html' %}
+
+<div class="container py-5">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+  
+    {% for pelicula in peliculas %}
+      <!-- Card dinámico para cada película -->
+      <div class="col">
+        <div class="card h-100 bg-dark text-white border-0 shadow">
+          <!-- Imagen de la película (usamos la portada convertida a base64) -->
+          <img src="{{ pelicula['portada'] }}" class="card-img-top" alt="{{ pelicula['titulo'] }}">
+          <div class="card-body">
+            <!-- Título de la película -->
+            <h5 class="card-title">{{ pelicula['titulo'] }}</h5>
+            <!-- Descripción de la película -->
+            <p class="card-text">{{ pelicula['descripcion'] if pelicula['descripcion'] else "Descripción no disponible" }}</p>
+          </div>
+          <div class="card-footer bg-transparent border-0">
+            <a href="{{ url_for('ViewPeli', id=pelicula['id']) }}" class="btn btn-outline-light w-100">Ver más</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  
+    </div>
+</div>
+
+<style>
+      :root {
+        --bg-color: #0f151c;
+        --bg-transparente: #0f151cc2;
+        --box-shadow: #121921;
+        --color-back: #000000;
+        --color-border: rgba(209, 213, 219, 0.3);
+        --color-letra_primario: #d5d5d5;
+        --color-naranja: #ff6347;
+        --color-letra_secundario: #e4e4e4;
+        --color-letra_titulo:#3dd9ff;
+      }
+    .card-img-top {
+      height: 350px;
+      object-fit: cover;
+      background-color: var(--box-shadow);
+    }
+    .card{
+      background-color: var(--bg-transparente) !important;
+      border: 1px solid var(--color-back) !important;
+    }
+    .card-body h5{
+        color: var(--color-letra_titulo);
+        text-shadow: 1px 2px 3px var(--color-border);
+        text-align: center;
+        font-weight: bold;
+    }
+    .card-body p{
+      font-size: 14px;
+      color: var(--color-letra_secundario);
+      font-family: "Inter", sans-serif;
+      font-weight: 300;
+    }
+    @media (max-width: 767px) {
+    #Imagenportada {
+        height: 300px !important;
+        object-fit: cover;
+    }
+}
+
+</style>
+
+{% include 'sitio/footer.html' %}

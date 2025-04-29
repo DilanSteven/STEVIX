@@ -1,0 +1,94 @@
+{% include 'admin/navbar_lateral.html' %}
+<style>
+  .contenido-1{
+    width: 100%;
+  }
+  /* Contenedor de la presentación */
+  .presentation-container {
+    display: flex;
+    justify-content: center;  /* Centrado horizontal */
+    align-items: center;      /* Centrado vertical */
+    flex-direction: column;
+    text-align: center;
+    padding: 3rem;
+    background-color: var(--bg-color); /* Fondo oscuro */
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 100%; /* Asegura que ocupe todo el espacio */
+    max-width: 800px; /* Controla el tamaño máximo del contenedor */
+    font-size: 15px;
+    margin: auto;
+  }
+
+  /* Logo */
+  .logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Título */
+  .title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-top: 1rem;
+    color: #FFD700; /* Color dorado */
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+
+  /* Subtítulo */
+  .subtitle {
+    font-size: 1.4rem;
+    color: #B0B0B0; /* Gris claro */
+    margin-top: 1rem;
+    font-weight: 300;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+  }
+
+  /* Responsividad */
+  @media (max-width: 768px) {
+    .title {
+      font-size: 2.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .title {
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+    }
+  }
+</style>
+<head>
+  <title>Inicio Administrador</title>
+</head>
+<div class="presentation-container">
+  <img src="https://img.icons8.com/external-icongeek26-linear-colour-icongeek26/64/000000/external-wolf-animal-faces-icongeek26-linear-colour-icongeek26.png" alt="Logo" class="logo">
+  <div class="title">ディラン</div>
+  <div class="subtitle">
+    Bienvenido al perfil de administrador. Aquí puedes gestionar todos los aspectos clave de la plataforma, de una manera sencilla, rápida y eficiente. Todo lo que necesitas está al alcance de tu mano.
+  </div>
+
+</div>

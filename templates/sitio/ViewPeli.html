@@ -1,0 +1,363 @@
+{% include 'sitio/navbar.html' %}
+{% include 'sitio/sectionInicio.html' %}
+  <style>
+.borde-parcial ,.borde-inferior-parcial {
+  position: relative;
+}
+
+/* Borde superior parcial */
+.borde-parcial::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 60%; /* Aquí controlas qué parte del borde se pinta */
+  background-color: white;
+}
+/* Borde inferior parcial */
+.borde-inferior-parcial::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 2px;        /* Grosor del "borde" */
+  width: 60%;         /* Solo el 15% del ancho se pinta */
+  background-color: white;
+}
+
+
+  </style>
+<div class=" borde-parcial presentacion borde-inferior-parcial container my-5 p-4 bg-dark text-light rounded shadow-lg">
+    <!-- Título + etiquetas -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+      <h1 class="display-6 mb-2 mb-md-0">{{ pelicula['titulo'] }}</h1>
+      <div class="d-flex flex-wrap gap-2">
+        {% if pelicula.get('anio') %}
+        <span class="badge bg-secondary">{{ pelicula['anio'] }}</span>
+        {% endif %}
+        {% if pelicula.get('clasificacion') %}
+        <span class="badge bg-info text-dark">{{ pelicula['clasificacion'] }}</span>
+        {% endif %}
+        {% if pelicula.get('duracion') %}
+        <span class="badge bg-primary">{{ pelicula['duracion'] }} min</span>
+        {% endif %}
+        <span class="badge bg-light text-dark">Idioma: Latino</span>
+      </div>
+    </div>
+  
+    <!-- Contenido -->
+    <div class="row g-4">
+      <!-- Portada -->
+      <div class="col-md-3 text-center">
+        {% if pelicula.get('portada') %}
+        <img src="{{ pelicula['portada'] }}" alt="{{ pelicula['titulo'] }}" class="img-fluid rounded shadow-sm" style="max-height: 250px; object-fit: cover;">
+        {% endif %}
+      </div>
+  
+      <!-- Descripción y detalles -->
+      <div class="col-md-6">
+        {% if pelicula.get('director') %}
+        <p class="mb-1"><strong>Director:</strong> {{ pelicula['director'] }}</p>
+        {% endif %}
+  
+        {% if pelicula.get('fecha_estreno') %}
+        <p class="mb-1"><strong>Fecha de estreno:</strong> {{ pelicula['fecha_estreno'] }}</p>
+        {% endif %}
+  
+        {% if pelicula.get('descripcion') %}
+        <p class="mt-3">{{ pelicula['descripcion'] }}</p>
+        {% endif %}
+  
+        {% if pelicula.get('generos') %}
+        <div class="mt-2">
+          {% for genero in pelicula['generos'] %}
+          <span class="badge bg-secondary me-1">{{ genero }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+  
+      <!-- Medidor de Puntuación (Tipo Carga Mejorado) -->
+      <div class="col-md-3 d-flex justify-content-center align-items-center pt-3">
+        <div class="circle-container">
+          <div class="circle-background"></div>
+          <div class="circle-progress"></div>
+
+
+          <div class="circle-center">
+            {{ "%.1f"|format(random.uniform(7.5, 10.0)) }}
+            <small class="text-muted" style="font-size: 0.6rem;">/ 10</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <style>
+    .gallery-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .gallery-item:hover img {
+        transform: scale(1.05);
+    }
+
+    .gallery-title {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .gallery-item img {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    @media (max-width: 768px) {
+        .gallery-item img {
+            height: 150px;
+        }
+    }
+</style>
+    <!-- Galería -->
+    <div class="row mt-5">
+        <div class="col text-center">
+          <h5 class="display-6 mb-2 mb-md-0">Galería</h5>
+          <h5 class="display-6 mb-2 mb-md-0" id="movieTitle">{{ pelicula['titulo'] }}</h5>
+          <br>
+        </div>
+      </div>
+
+<!-- Contenedor de la Galería -->
+<div id="gallery" class="container">
+    <div class="row" id="galleryRow">
+        <!-- Las imágenes se cargarán aquí dinámicamente -->
+    </div>
+</div>
+
+<!-- Agregar jQuery, Popper.js y Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Obtener el título de la película desde el HTML (pasado desde Python)
+    const movieTitle = document.getElementById('movieTitle').textContent.trim();
+
+    // Clave de acceso de TMDb (sustitúyela por tu clave real)
+    const TMDB_API_KEY = '13f0fb6807cf21534fc362fadb71b464'; // REEMPLAZA AQUÍ CON TU CLAVE DE ACCESO REAL
+
+    // Función para obtener imágenes de la API de TMDb
+    function generateImagesFromAPI() {
+        const galleryRow = document.getElementById('galleryRow');
+
+        // Primero buscamos la película por su título en la API de TMDb
+        fetch(`https://api.themoviedb.org/3/search/movie?query=${movieTitle}&api_key=${TMDB_API_KEY}`)
+            .then(response => response.json())
+            .then(data => {
+                const movie = data.results[0]; // Tomamos el primer resultado (suponiendo que es el correcto)
+                const movieId = movie.id;
+
+                // Ahora obtenemos las imágenes de esa película
+                fetch(`https://api.themoviedb.org/3/movie/${movieId}/images?api_key=${TMDB_API_KEY}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const images = data.backdrops; // Usamos las imágenes de "backdrops" (escenas)
+                        if (images && images.length > 0) {
+                            images.slice(0, 9).forEach(image => { // Mostramos hasta 9 imágenes
+                                const galleryItem = document.createElement('div');
+                                galleryItem.classList.add('col-md-4', 'col-sm-6', 'col-12', 'mb-4');
+
+                                const itemContent = `
+                                    <div class="gallery-item">
+                                        <img src="https://image.tmdb.org/t/p/w500${image.file_path}" alt="${image.file_path}">
+                                    </div>
+                                `;
+
+                                galleryItem.innerHTML = itemContent;
+                                galleryRow.appendChild(galleryItem);
+                            });
+                        } else {
+                            galleryRow.innerHTML = '<p>No se encontraron imágenes para esta película.</p>';
+                        }
+                    })
+                    .catch(error => console.log('Error al cargar las imágenes:', error));
+            })
+            .catch(error => console.log('Error al buscar la película:', error));
+    }
+
+    // Llamar a la función para cargar la galería
+    generateImagesFromAPI();
+</script>
+
+  <script>
+    // Generar un valor aleatorio entre 75 y 100
+    const puntuacion = (Math.random() * (100 - 75) + 75).toFixed(2);  // Redondear a 2 decimales
+    
+    // Establecer el valor de stroke-dasharray dinámicamente
+    document.querySelector('.circle-progress').style.strokeDasharray = `${puntuacion} 100`;
+  </script>
+  
+  <!-- Estilos para el Medidor de Carga Mejorado -->
+  <style>
+    .presentacion {
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+    /* Contenedor para el círculo de carga */
+    .circle-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: transparent;
+    }
+    :root {
+  --bg-color: #0f151c;
+  --text-color: #ffffff;
+  --accent-color: #0058d4;
+  --font-family: "Open Sans", sans-serif;
+}
+    /* Fondo del círculo */
+    .circle-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: var(--bg-color);
+    }
+    .text-muted{
+        color: var(--text-color) !important;
+    }
+  
+    /* Progreso del círculo (borde que se llena) */
+    .circle-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 10px solid transparent;
+      border-top: 10px solid #facc15; /* Color del progreso */
+      transform: rotate(-90deg); /* Iniciar desde el 0% */
+      transform-origin: 50% 50%;
+      transition: stroke-dasharray 1s ease-out;
+    }
+  
+    /* Texto centrado en el círculo */
+    .circle-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #facc15;
+      text-align: center;
+    }
+  </style>
+  
+  
+
+  <div class="borde-parcial container my-5 ver-pelicula-section">
+    <!-- Título estilizado -->
+    <div class="text-center mb-4">
+        <br>
+      <h3 class="fw-bold text-accent">🎬 Ver Película</h3>
+      <hr class="hr-accent mx-auto">
+    </div>
+  
+    <div class="row align-items-center g-4 contenedor-video rounded-4 p-3">
+      
+      <!-- Video a la izquierda -->
+      <div class="col-lg-8">
+        <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow">
+          <iframe
+            src="{{ pelicula['link'] }}"
+            allowfullscreen
+            loading="lazy"
+            class="border-0"
+          ></iframe>
+        </div>
+      </div>
+  
+      <!-- Imagen a la derecha -->
+      <div class="col-lg-4 text-center">
+        <img
+          src="/static/images/moxie.png"
+          alt="Poster Película"
+          class="img-fluid img-sin-fondo "
+        >
+      </div>
+  
+    </div>
+  </div>
+  
+  
+<style>
+
+
+  .hr-accent {
+    width: 80px;
+    border: none;
+    height: 3px;
+    background-color: var(--accent-color);
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    opacity: 0.9;
+  }
+
+  .img-sin-fondo {
+    background-color: transparent;
+    max-height: 450px;
+    object-fit: contain;
+    border-radius: 1rem;
+    filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s ease;
+  }
+
+  .img-sin-fondo:hover {
+    transform: scale(1.03);
+  }
+
+  @media (max-width: 768px) {
+    .img-sin-fondo {
+      max-height: 300px;
+    }
+  }
+
+/* Responsive adjustments (example) */
+@media (max-width: 768px) {
+  .main-content {
+    grid-template-columns: 1fr; /* Stack columns on smaller screens */
+    text-align: center;
+  }
+
+  .poster-container {
+    max-width: 200px;
+    margin: 0 auto;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .movie-title {
+    margin-bottom: 10px;
+  }
+}
+</style>
+{% include 'sitio/footer.html' %}

@@ -1,0 +1,169 @@
+{% include 'admin/navbar_lateral.html' %}
+
+<div class="container py-5">
+  <h1 class="titulo-pagina mb-4">Editar Anime</h1>
+
+  <form method="POST" enctype="multipart/form-data">
+    <!-- Título -->
+    <div class="mb-3">
+      <label for="titulo" class="form-label">Título:</label>
+      <input type="text" name="titulo" id="titulo" class="form-control" value="{{ temporada['titulo'] }}" required>
+    </div>
+
+    <!-- Descripción -->
+    <div class="mb-3">
+      <label for="descripcion" class="form-label">Descripción:</label>
+      <textarea name="descripcion" id="descripcion" class="form-control" rows="3" required>{{ temporada['descripcion'] }}</textarea>
+    </div>
+
+    <!-- Género -->
+    <div class="mb-3">
+      <label for="genero" class="form-label">Género:</label>
+      <input type="text" name="genero" id="genero" class="form-control" value="{{ temporada['genero'] }}" required>
+    </div>
+
+    <!-- Fecha de estreno -->
+    <div class="mb-3">
+      <label for="fecha_estreno" class="form-label">Fecha de Estreno:</label>
+      <input type="date" name="fecha_estreno" id="fecha_estreno" class="form-control" value="{{ temporada['fecha_estreno'] }}" required>
+    </div>
+
+    <!-- Estado -->
+    <div class="mb-3">
+      <label for="estado" class="form-label">Estado:</label>
+      <select name="estado" id="estado" class="form-select" required>
+        <option value="En emisión" {% if temporada['estado'] == 'En emisión' %}selected{% endif %}>En emisión</option>
+        <option value="Finalizado" {% if temporada['estado'] == 'Finalizado' %}selected{% endif %}>Finalizado</option>
+        <option value="Próximamente" {% if temporada['estado'] == 'Próximamente' %}selected{% endif %}>Próximamente</option>
+      </select>
+    </div>
+
+    <!-- Mostrar portada actual -->
+    <div class="mb-3">
+      <label for="portada" class="form-label">Portada Actual:</label><br>
+      {% if temporada['portada'] %}
+        <img src="{{ temporada['portada'] }}" alt="Portada Actual" class="img-fluid" style="max-width: 200px;">
+      {% else %}
+        <p>No hay portada actual.</p>
+      {% endif %}
+    </div>
+
+    <!-- Campo para subir nueva portada con previsualización -->
+    <div class="mb-3">
+      <label for="portada" class="form-label">Portada (opcional):</label>
+      <input type="file" name="portada" id="portada" class="form-control" onchange="previsualizarImagen(this, 'portadaPreview')">
+      <br>
+      <img id="portadaPreview" src="#" alt="Vista Previa de la Portada" style="max-width: 200px; display: none;">
+    </div>
+
+    <!-- Mostrar imagen de presentación actual -->
+    <div class="mb-3">
+      <label for="imagen_presentacion" class="form-label">Imagen de Presentación Actual:</label><br>
+      {% if temporada['imagen_presentacion'] %}
+        <img src="{{ temporada['imagen_presentacion'] }}" alt="Imagen de Presentación Actual" class="img-fluid" style="max-width: 200px;">
+      {% else %}
+        <p>No hay imagen de presentación actual.</p>
+      {% endif %}
+    </div>
+
+    <!-- Campo para subir nueva imagen de presentación con previsualización -->
+    <div class="mb-3">
+      <label for="imagen_presentacion" class="form-label">Imagen de Presentación (opcional):</label>
+      <input type="file" name="imagen_presentacion" id="imagen_presentacion" class="form-control" onchange="previsualizarImagen(this, 'imagenPresentacionPreview')">
+      <br>
+      <img id="imagenPresentacionPreview" src="#" alt="Vista Previa de la Imagen de Presentación" style="max-width: 200px; display: none;">
+    </div>
+
+    <!-- Botón para guardar cambios -->
+    <button type="submit" class="btn btn-success">Actualizar Anime</button>
+  </form>
+</div>
+
+<script>
+  function previsualizarImagen(input, imgId) {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById(imgId).src = e.target.result;
+      document.getElementById(imgId).style.display = 'block'; // Muestra la imagen previsualizada
+    }
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
+</script>
+
+<style>
+  .titulo-pagina {
+    color: var(--accent-color);
+  }
+
+  .form-label {
+    color: var(--text-color);
+  }
+
+  .form-control {
+    background-color: #2a333d;
+    color: var(--text-color);
+    border: 1px solid #3a444f;
+  }
+
+  .form-control:focus {
+    background-color: #2a333d;
+    color: var(--text-color);
+    border-color: var(--accent-color);
+  }
+
+  .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+
+  .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+
+  img.img-fluid {
+    max-width: 100%;
+    height: auto;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 15px;
+    }
+
+    .titulo-pagina {
+      font-size: 1.8em;
+    }
+
+    .btn {
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding: 10px;
+    }
+
+    .titulo-pagina {
+      font-size: 1.6em;
+    }
+
+    .form-control {
+      font-size: 0.85rem;
+    }
+
+    .btn {
+      font-size: 0.8rem;
+    }
+  }
+</style>
+
+{% include 'admin/footer.html' %}

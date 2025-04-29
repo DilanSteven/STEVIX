@@ -1,0 +1,16 @@
+<h2>Editar Usuario</h2>
+<form method="POST">
+  <div class="mb-3">
+    <label class="form-label">Usuario</label>
+    <input type="text" name="usuario" class="form-control" value="{{ usuario[2] }}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Tipo de Perfil</label>
+    <input type="text" name="tipo_perfil" class="form-control" value="{{ usuario[1] }}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Nueva Contraseña (opcional)</label>
+    <input type="password" name="contraseña" class="form-control">
+  </div>
+  <button type="submit" class="btn btn-success">Guardar Cambios</button>
+</form>

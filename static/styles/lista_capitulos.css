@@ -1,0 +1,135 @@
+.container-70 {
+    width: 88% !important;
+    margin: 0 auto;
+}
+
+.container {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 20px;
+    border-radius: 8px;
+}
+.contenido-1 .container .d-flex h2 {
+    color: var(--color-letra_titulo) !important;
+    font-weight: bold;
+    width: 70% !important;
+}
+
+.contenido-1{
+    width: 70% !important;
+    font-weight: bold !important;
+}
+
+.titulo-pagina {
+    font-size: 2em;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+.btn {
+    font-size: 1rem;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.table {
+    background-color: #ffffff;
+    color: var(--text-color);
+    font-size: 15px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f2f2f2;
+}
+
+.table th,
+.table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table th {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    text-align: center;
+}
+
+td {
+    background-color: #121921 !important;
+    color: var(--text-color) !important;
+}
+
+table thead tr th {
+    background-color: #309b9d !important;
+}
+.table {
+    background-color: #ffffff;
+    color: var(--text-color);
+    font-size: 15px;
+  }
+
+@media (max-width: 768px) {
+    .container-70 {
+        width: 90%; /* Para pantallas más pequeñas se ajusta a un 90% */
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    .titulo-pagina {
+        font-size: 1.8em;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+    }
+
+    .table {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container-70 {
+        width: 100%; /* Para dispositivos móviles ocupará el 100% */
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .titulo-pagina {
+        font-size: 1.6em;
+    }
+
+    .table th,
+    .table td {
+        font-size: 0.8rem;
+    }
+
+    .btn {
+        font-size: 0.8rem;
+    }
+
+    .tr {
+        background-color: #0f151ce6 !important;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #e0e0e0;
+    }
+}

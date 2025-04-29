@@ -1,0 +1,62 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/lista_capitulos.css') }}">
+    <title>Lista de Capitulos</title>
+</head>
+{% include 'admin/navbar_lateral.html' %}
+<div class="container container-70 py-2">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Lista de Capítulos</h2>
+        <a href="{{ url_for('crear_capitulo') }}" class="btn btn-primary">+ Crear Capítulo</a>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <form method="GET" class="mb-2">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="Buscar por capítulo, temporada o anime" value="{{ search_term }}">
+            <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+        </div>
+    </form>
+
+    {% if capitulos %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Capitulo</th>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Anime</th>
+                        <th>Temporada</th>
+                        <th>Duración</th>
+                        <th>Link</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cap in capitulos %}
+                    <tr>
+                        <td>{{ cap.numero_capitulo }}</td>
+                        <td>{{ cap.titulo_capitulo }}</td>
+                        <td>{{ cap.descripcion[:60] }}...</td>
+                        <td>{{ cap.titulo_anime }}</td>
+                        <td>{{ cap.titulo_temporada }}</td>
+                        <td>{{ cap.duracion }} min</td>
+                        <td>
+                            {% if cap.link %}
+                                <a href="{{ cap.link }}" target="_blank" class="btn btn-sm btn-outline-secondary">Ver</a>
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('editar_capitulo', id=cap['id']) }}" class="btn btn-sm btn-outline-primary">Editar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info mt-4">No se encontraron capítulos.</div>
+    {% endif %}
+</div>

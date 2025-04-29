@@ -1,0 +1,23 @@
+<h2>Usuarios</h2>
+<table class="table table-dark">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Usuario</th>
+      <th>Perfil</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in usuarios %}
+    <tr>
+      <td>{{ user[0] }}</td>
+      <td>{{ user[2] }}</td>
+      <td>{{ user[1] }}</td>
+      <td>
+        <a href="{{ url_for('editar_usuario', id=user[0]) }}" class="btn btn-warning btn-sm">Editar</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -1,0 +1,129 @@
+{% include 'admin/navbar_lateral.html' %}
+
+<div class="container py-5">
+  <h1 class="titulo-pagina mb-4">Editar Temporada</h1>
+
+  <form method="POST" enctype="multipart/form-data">
+    <!-- Selección de anime -->
+    <div class="mb-3">
+      <label for="anime_id" class="form-label">Anime:</label>
+      <select name="anime_id" id="anime_id" class="form-select" required>
+        {% for anime in animes %}
+          <option value="{{ anime['id'] }}" {% if anime['id'] == temporada['anime_id'] %}selected{% endif %}>
+            {{ anime['titulo'] }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Número de temporada -->
+    <div class="mb-3">
+      <label for="numero_temporada" class="form-label">Número de Temporada:</label>
+      <input type="number" name="numero_temporada" id="numero_temporada" class="form-control" value="{{ temporada['numero_temporada'] }}" required>
+    </div>
+
+    <!-- Título -->
+    <div class="mb-3">
+      <label for="titulo" class="form-label">Título:</label>
+      <input type="text" name="titulo" id="titulo" class="form-control" value="{{ temporada['titulo'] }}" required>
+    </div>
+
+    <!-- Fecha de estreno -->
+    <div class="mb-3">
+      <label for="fecha_estreno" class="form-label">Fecha de Estreno:</label>
+      <input type="date" name="fecha_estreno" id="fecha_estreno" class="form-control" value="{{ temporada['fecha_estreno']|replace(' 00:00:00', '') }}" required>
+    </div>
+
+    <!-- Portada -->
+    <div class="mb-3">
+      <label for="portada" class="form-label">Portada:</label>
+      <input type="file" name="portada" id="portada" class="form-control" accept="image/*">
+    </div>
+
+    <!-- Mostrar portada actual -->
+    {% if portada_uri %}
+      <div class="mb-3">
+        <label class="form-label">Portada Actual:</label>
+        <img src="{{ portada_uri }}" style="height: 200px; border: 1px solid #ccc;" class="img-fluid">
+      </div>
+    {% endif %}
+
+    <!-- Botón para guardar cambios -->
+    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+  </form>
+</div>
+<style>
+    
+
+.titulo-pagina {
+  color: var(--accent-color);
+}
+
+.form-label {
+  color: var(--text-color);
+}
+
+.form-control {
+  background-color: #2a333d;
+  color: var(--text-color);
+  border: 1px solid #3a444f;
+}
+
+.form-control:focus {
+  background-color: #2a333d;
+  color: var(--text-color);
+  border-color: var(--accent-color);
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+img.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .titulo-pagina {
+    font-size: 1.8em;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+  }
+
+  .form-control {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+
+  .titulo-pagina {
+    font-size: 1.6em;
+  }
+
+  .form-control {
+    font-size: 0.85rem;
+  }
+
+  .btn {
+    font-size: 0.8rem;
+  }
+}
+</style>
+{% include 'admin/footer.html' %}

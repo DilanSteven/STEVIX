@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Película</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-dark text-white">
+    <div class="container mt-5">
+        <h2 class="text-center text-primary">Editar Película</h2>
+
+        <form action="/EditPeli/{{ pelicula.id }}" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">Anime</label>
+                <select class="form-control" name="anime_id" required>
+                    {% for anime in anime_ids %}
+                    <option value="{{ anime[0] }}" {% if anime[0] == pelicula.anime_id %}selected{% endif %}>
+                        {{ anime[1] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input type="text" class="form-control" name="titulo" value="{{ pelicula.titulo }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea class="form-control" name="descripcion" rows="3">{{ pelicula.descripcion }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Fecha de Estreno</label>
+                <input type="date" class="form-control" name="fecha_estreno" value="{{ pelicula.fecha_estreno }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Duración (minutos)</label>
+                <input type="number" class="form-control" name="duracion" value="{{ pelicula.duracion }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Link</label>
+                <input type="url" class="form-control" name="link" value="{{ pelicula.link }}"
+                    placeholder="https://ejemplo.com/trailer">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Portada actual</label><br>
+                <img src="{{ pelicula.portada }}" width="200" class="img-thumbnail mb-2">
+                <input type="file" class="form-control" name="portada" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-success w-100">Guardar Cambios</button>
+        </form>
+    </div>
+</body>
+
+</html>
