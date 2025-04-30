@@ -3,7 +3,7 @@ import base64
 from flask import request
 from db import get_db_connection 
 from flask import Blueprint, render_template, request, redirect, url_for
-#Obtener Listado de Animes
+# Obtener Listado de Animes
 def obtener_animes():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -14,7 +14,7 @@ def obtener_animes():
         cursor.execute('''
             SELECT id, titulo, descripcion, genero, estado, fecha_estreno, portada
             FROM Anime
-            WHERE titulo LIKE ? OR genero LIKE ?
+            WHERE titulo ILIKE %s OR genero ILIKE %s
             ORDER BY titulo ASC
         ''', (f'%{search_term}%', f'%{search_term}%'))
     else:
@@ -51,6 +51,8 @@ def obtener_animes():
 
     return animes, search_term
 
+
+# Crear Anime
 def crear_anime():
     if request.method == 'POST':
         titulo = request.form['titulo']
@@ -65,7 +67,7 @@ def crear_anime():
         cursor = conn.cursor()
         cursor.execute(''' 
             INSERT INTO Anime (titulo, descripcion, genero, fecha_estreno, estado, portada, imagen_presentacion) 
-            VALUES (?, ?, ?, ?, ?, ?, ?) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         ''', (
             titulo,
             descripcion,
@@ -83,11 +85,12 @@ def crear_anime():
 
     return render_template('admin/crear_anime.html')
 
+
+# Editar Anime
 def editar_anime(anime_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Manejo de método POST para actualización de los datos
     if request.method == 'POST':
         titulo = request.form['titulo']
         descripcion = request.form['descripcion']
@@ -97,22 +100,13 @@ def editar_anime(anime_id):
         portada = request.files['portada']
         imagen_presentacion = request.files['imagen_presentacion']
 
-        # Si se sube una portada nueva
-        if portada and portada.filename:
-            portada_data = portada.read()
-        else:
-            portada_data = None
+        portada_data = portada.read() if portada and portada.filename else None
+        imagen_presentacion_data = imagen_presentacion.read() if imagen_presentacion and imagen_presentacion.filename else None
 
-        # Si se sube una imagen de presentación nueva
-        if imagen_presentacion and imagen_presentacion.filename:
-            imagen_presentacion_data = imagen_presentacion.read()
-        else:
-            imagen_presentacion_data = None
-
-        # Realizar la actualización con los nuevos datos
         cursor.execute('''
-            UPDATE Anime SET titulo=?, descripcion=?, genero=?, fecha_estreno=?, estado=?, portada=?, imagen_presentacion=? 
-            WHERE id=?
+            UPDATE Anime 
+            SET titulo = %s, descripcion = %s, genero = %s, fecha_estreno = %s, estado = %s, portada = %s, imagen_presentacion = %s 
+            WHERE id = %s
         ''', (
             titulo, descripcion, genero, fecha_estreno, estado,
             portada_data,
@@ -121,14 +115,13 @@ def editar_anime(anime_id):
         ))
 
         conn.commit()
-
         cursor.close()
         conn.close()
 
         return redirect(url_for('ver_animes'))
 
-    # Manejo de método GET para obtener los datos del anime a editar
-    cursor.execute('SELECT * FROM Anime WHERE id = ?', (anime_id,))
+    # Método GET
+    cursor.execute('SELECT * FROM Anime WHERE id = %s', (anime_id,))
     row = cursor.fetchone()
 
     if not row:
@@ -136,22 +129,19 @@ def editar_anime(anime_id):
         conn.close()
         return "Anime no encontrado", 404
 
-    # Obtener los nombres de las columnas para convertir la fila en un diccionario
     col_names = [col[0] for col in cursor.description]
     temporada = dict(zip(col_names, row))
 
-    # Preparar la URI para la portada, en caso de que no haya, se asigna una imagen predeterminada
     portada_uri = (
         f"data:image/jpeg;base64,{base64.b64encode(temporada['portada']).decode('utf-8')}"
         if temporada['portada'] else
         "https://via.placeholder.com/200x300?text=No+Imagen"
     )
 
-    # Obtener lista de animes
     cursor.execute('SELECT id, titulo FROM Anime ORDER BY titulo')
-    animes = cursor.fetchall()
+    animes_raw = cursor.fetchall()
     col_names = [col[0] for col in cursor.description]
-    animes = [dict(zip(col_names, a)) for a in animes]
+    animes = [dict(zip(col_names, a)) for a in animes_raw]
 
     cursor.close()
     conn.close()
