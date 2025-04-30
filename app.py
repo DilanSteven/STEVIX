@@ -10,6 +10,7 @@ import hashlib
 from anime import obtener_animes,crear_anime,editar_anime
 #Conexion de base de datos
 from db import get_db_connection
+import psycopg2
 
 
 
@@ -17,16 +18,28 @@ app=Flask(__name__)
 app.secret_key = 'tu_clave_super_secreta'
 
 # Datos de conexión
-server = 'DESKTOP-VA8T8I5\SQLEXPRESS'  # Tu servidor SQL Server
-database = 'STEVIX'  # El nombre de tu base de datos
+#server = 'DESKTOP-VA8T8I5\SQLEXPRESS'  # Tu servidor SQL Server
+#database = 'STEVIX'  # El nombre de tu base de datos
 
 # Función para obtener la conexión a la base de datos (autenticación de Windows)
+#def get_db_connection():
+#    conn = pyodbc.connect(f'DRIVER={{ODBC Driver 17 for SQL Server}};'
+#                          f'SERVER={server};'
+#                          f'DATABASE={database};'
+#                          'Trusted_Connection=yes;')  # Utiliza la autenticación de Windows
+#    return conn
+
+# Datos de conexión para PostgreSQL en Render
 def get_db_connection():
-    conn = pyodbc.connect(f'DRIVER={{ODBC Driver 17 for SQL Server}};'
-                          f'SERVER={server};'
-                          f'DATABASE={database};'
-                          'Trusted_Connection=yes;')  # Utiliza la autenticación de Windows
+    conn = psycopg2.connect(
+        host='dpg-d08n0s95pdvs739mi980-a.oregon-postgres.render.com',
+        port=5432,
+        database='stevix',
+        user='stevix',
+        password='eCiIdjZOFn3M2h4vcabGY5DJa607Lbl0'
+    )
     return conn
+
 #Listado de 
     #Anime
 # Vista para ver animes
@@ -887,3 +900,4 @@ def cerrar_sesion():
 
 if __name__ =='__main__':
     app.run(debug=True)
+    
