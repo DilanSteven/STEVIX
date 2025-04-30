@@ -409,22 +409,22 @@ def api_buscar_animes():
 
         # Buscar animes con portada de su PRIMERA temporada
         cursor.execute("""
-            SELECT a.id, a.titulo, a.descripcion, t.portada, 'anime' AS tipo
-            FROM Anime a
-            JOIN temporada t ON a.id = t.anime_id
-            WHERE a.titulo LIKE ?
-            AND t.id = (
-                SELECT TOP 1 t2.id FROM temporada t2 WHERE t2.anime_id = a.id ORDER BY t2.fecha_estreno
-            )
+        SELECT a.id, a.titulo, a.descripcion, t.portada, 'anime' AS tipo
+        FROM Anime a
+        JOIN temporada t ON a.id = t.anime_id
+        WHERE a.titulo ILIKE %s
+        AND t.id = (
+        SELECT t2.id FROM temporada t2 WHERE t2.anime_id = a.id ORDER BY t2.fecha_estreno LIMIT 1)
         """, (f'%{titulo}%',))
         animes = cursor.fetchall()
 
         # Buscar películas (usando portada propia)
         cursor.execute("""
-            SELECT p.id, p.titulo, p.descripcion, p.portada, 'pelicula' AS tipo
-            FROM pelicula p
-            WHERE p.titulo LIKE ?
+        SELECT p.id, p.titulo, p.descripcion, p.portada, 'pelicula' AS tipo
+        FROM pelicula p
+        WHERE p.titulo ILIKE %s
         """, (f'%{titulo}%',))
+
         peliculas = cursor.fetchall()
 
         # Unificar resultados
@@ -465,10 +465,12 @@ def ver_capitulos_anime(id):
     cursor = conn.cursor()
 
     # Obtener anime
-    cursor.execute('SELECT titulo, descripcion, portada FROM anime WHERE id = ?', (id,))
+    cursor.execute('SELECT titulo, descripcion, portada FROM anime WHERE id = %s', (id,))
     anime_data = cursor.fetchone()
 
     if not anime_data:
+        cursor.close()
+        conn.close()
         return "Anime no encontrado", 404
 
     titulo, descripcion, portada_bin = anime_data
@@ -479,7 +481,7 @@ def ver_capitulos_anime(id):
     )
 
     # Obtener temporadas y sus capítulos
-    cursor.execute("SELECT id, titulo, portada FROM temporada WHERE anime_id = ? ORDER BY fecha_estreno", (id,))
+    cursor.execute("SELECT id, titulo, portada FROM temporada WHERE anime_id = %s ORDER BY fecha_estreno", (id,))
     temporadas_raw = cursor.fetchall()
 
     temporadas = []
@@ -489,12 +491,12 @@ def ver_capitulos_anime(id):
             if temp_portada_bin else
             "https://via.placeholder.com/50x50?text=No+Imagen"
         )
-        
+
         # Obtener capítulos para la temporada actual
         cursor.execute("""
             SELECT id, numero_capitulo, titulo, link
             FROM capitulo
-            WHERE temporada_id = ?
+            WHERE temporada_id = %s
             ORDER BY numero_capitulo
         """, (temp_id,))
         caps = cursor.fetchall()
@@ -508,7 +510,7 @@ def ver_capitulos_anime(id):
         temporadas.append({
             'id': temp_id,
             'titulo': temp_titulo,
-            'portada': temp_portada,  # Añadir portada de temporada
+            'portada': temp_portada,
             'capitulos': capitulos
         })
 
@@ -775,7 +777,7 @@ def login():
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT id_usuario, tipo_perfil FROM Usuario WHERE usuario = ? AND contraseña = ?', (usuario, hashed_password))
+        cursor.execute('SELECT id_usuario, tipo_perfil FROM Usuario WHERE usuario = %s AND contraseña = %s',(usuario, hashed_password))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
