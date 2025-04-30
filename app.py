@@ -368,7 +368,8 @@ def index():
         SELECT a.id, a.titulo, a.descripcion, a.portada
         FROM Anime a
         JOIN temporada t ON a.id = t.anime_id
-        WHERE YEAR(t.fecha_estreno) = 2024
+        WHERE EXTRACT(YEAR FROM t.fecha_estreno) = 2024
+
     """)
     resultados = cursor.fetchall()
 
