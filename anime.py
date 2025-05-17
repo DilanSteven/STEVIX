@@ -1,7 +1,7 @@
 # anime.py
 import base64
 from flask import request
-from db import get_db_connection 
+from conexion import get_db_connection 
 from flask import Blueprint, render_template, request, redirect, url_for
 # Obtener Listado de Animes
 def obtener_animes():
@@ -86,7 +86,7 @@ def crear_anime():
     return render_template('admin/crear_anime.html')
 
 
-# Editar Anime
+# Editar Anime 
 def editar_anime(anime_id):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -102,6 +102,15 @@ def editar_anime(anime_id):
 
         portada_data = portada.read() if portada and portada.filename else None
         imagen_presentacion_data = imagen_presentacion.read() if imagen_presentacion and imagen_presentacion.filename else None
+
+        # Si no envían nueva portada, mantener la anterior
+        if not portada_data:
+            cursor.execute('SELECT portada FROM Anime WHERE id = %s', (anime_id,))
+            portada_data = cursor.fetchone()[0]
+
+        if not imagen_presentacion_data:
+            cursor.execute('SELECT imagen_presentacion FROM Anime WHERE id = %s', (anime_id,))
+            imagen_presentacion_data = cursor.fetchone()[0]
 
         cursor.execute('''
             UPDATE Anime 
@@ -132,18 +141,23 @@ def editar_anime(anime_id):
     col_names = [col[0] for col in cursor.description]
     temporada = dict(zip(col_names, row))
 
-    portada_uri = (
-        f"data:image/jpeg;base64,{base64.b64encode(temporada['portada']).decode('utf-8')}"
-        if temporada['portada'] else
-        "https://via.placeholder.com/200x300?text=No+Imagen"
-    )
+    # Construir URIs base64 para portada y presentación
+    if temporada['portada']:
+        portada_uri = f"data:image/jpeg;base64,{base64.b64encode(temporada['portada']).decode('utf-8')}"
+    else:
+        portada_uri = "https://via.placeholder.com/200x300?text=No+Imagen"
 
-    cursor.execute('SELECT id, titulo FROM Anime ORDER BY titulo')
-    animes_raw = cursor.fetchall()
-    col_names = [col[0] for col in cursor.description]
-    animes = [dict(zip(col_names, a)) for a in animes_raw]
+    if temporada['imagen_presentacion']:
+        imagen_presentacion_uri = f"data:image/jpeg;base64,{base64.b64encode(temporada['imagen_presentacion']).decode('utf-8')}"
+    else:
+        imagen_presentacion_uri = "https://via.placeholder.com/200x300?text=No+Imagen"
 
     cursor.close()
     conn.close()
 
-    return render_template('admin/editar_anime.html', temporada=temporada, animes=animes, portada_uri=portada_uri)
+    return render_template(
+        'admin/editar_anime.html',
+        temporada=temporada,
+        portada_uri=portada_uri,
+        imagen_presentacion_uri=imagen_presentacion_uri
+    )

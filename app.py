@@ -8,10 +8,11 @@ import random
 import hashlib
 #importacion de Anime
 from anime import obtener_animes,crear_anime,editar_anime
+from proof import Obtener_Imagen_Portada
 #Conexion de base de datos
-from db import get_db_connection
-import psycopg2
-
+from conexion import get_db_connection#👈 importar conexión
+from psycopg2.extras import RealDictCursor
+##################
 
 
 app=Flask(__name__)
@@ -30,15 +31,6 @@ app.secret_key = 'tu_clave_super_secreta'
 #    return conn
 
 # Datos de conexión para PostgreSQL en Render
-def get_db_connection():
-    conn = psycopg2.connect(
-        host='dpg-d08n0s95pdvs739mi980-a.oregon-postgres.render.com',
-        port=5432,
-        database='stevix',
-        user='stevix',
-        password='eCiIdjZOFn3M2h4vcabGY5DJa607Lbl0'
-    )
-    return conn
 
 #Listado de 
     #Anime
@@ -55,6 +47,14 @@ def crear_anime_route():
 @app.route('/admin/editar_anime/<int:anime_id>', methods=['GET', 'POST'])
 def editar_anime_route(anime_id):
     return editar_anime(anime_id)
+
+
+#Proof de Portada
+
+@app.route('/admin/proof', methods=['GET', 'POST'])
+def ver_portada():  # Nombre diferente al importado
+    return Obtener_Imagen_Portada()
+
 
 #inicio de session
 def login_required(f):
@@ -167,8 +167,7 @@ def ViewPeli(id):
     cursor = conn.cursor()
 
     # Consultar por ID de la película seleccionada
-    cursor.execute('SELECT p.id, p.titulo, p.descripcion, p.fecha_estreno, p.duracion, p.portada, p.link, a.portada FROM pelicula p JOIN Anime a ON p.anime_id = a.id WHERE p.id = ?', (id,))
-
+    cursor.execute('SELECT p.id, p.titulo, p.descripcion, p.fecha_estreno, p.duracion, p.portada, p.link, a.portada FROM pelicula p JOIN Anime a ON p.anime_id = a.id WHERE p.id = %s', (id,))
     pelicula = cursor.fetchone()
 
     if pelicula:
@@ -187,7 +186,7 @@ def ViewPeli(id):
         else:
             portada_data_uri1 = "https://via.placeholder.com/300x400?text=No+Imagen"
         # Obtener la portada de la primera película para la sección de inicio
-        cursor.execute('SELECT TOP 1 portada FROM pelicula')  # Corregido para SQL Server
+        cursor.execute('SELECT portada FROM pelicula LIMIT 1')  # Corregido para SQL Server
         primera_pelicula = cursor.fetchone()
         if primera_pelicula:
             portada_inicio_bin = primera_pelicula[0]
@@ -230,7 +229,7 @@ def EditPeli(id):
 
     if request.method == 'GET':
         # Obtener datos de la película
-        cursor.execute('SELECT * FROM pelicula WHERE id = ?', id)
+        cursor.execute('SELECT * FROM pelicula WHERE id = %s', (id,))
         pelicula = cursor.fetchone()
 
         if not pelicula:
@@ -458,14 +457,36 @@ def api_buscar_animes():
 
 
 #ver captuloo
-#ver captuloo
+# Función para verificar si una imagen binaria es WebP
+def es_webp(binario):
+    return binario[:4] == b'RIFF' and b'WEBP' in binario[:12]
+
+def obtener_mime_sin_imghdr(binario):
+    if not binario:
+        return 'image/jpeg'
+
+    # Convertir memoryview a bytes si es necesario
+    if isinstance(binario, memoryview):
+        binario = binario.tobytes()
+
+    # Verificar si es JPEG
+    if binario.startswith(b'\xff\xd8'):
+        return 'image/jpeg'
+
+    # Verificar si es WebP
+    if binario.startswith(b'RIFF') and b'WEBP' in binario[8:16]:
+        return 'image/webp'
+
+    return 'application/octet-stream'
+
+#Ver Anime Por Capitulos
 @app.route('/anime/<int:id>/ver_capitulos')
 def ver_capitulos_anime(id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Obtener anime
-    cursor.execute('SELECT titulo, descripcion, portada FROM anime WHERE id = %s', (id,))
+    # Consulta principal del anime
+    cursor.execute('SELECT titulo, descripcion, portada, imagen_presentacion,fecha_estreno,genero FROM anime WHERE id = %s', (id,))
     anime_data = cursor.fetchone()
 
     if not anime_data:
@@ -473,33 +494,41 @@ def ver_capitulos_anime(id):
         conn.close()
         return "Anime no encontrado", 404
 
-    titulo, descripcion, portada_bin = anime_data
-    portada = (
-        f"data:image/jpeg;base64,{base64.b64encode(portada_bin).decode('utf-8')}"
-        if portada_bin else
-        "https://via.placeholder.com/300x400?text=No+Imagen"
-    )
+    titulo, descripcion, portada_bin, presentacion_bin,fecha_estreno,genero = anime_data
 
-    # Obtener temporadas y sus capítulos
-    cursor.execute("SELECT id, titulo, portada FROM temporada WHERE anime_id = %s ORDER BY fecha_estreno", (id,))
+    # Función reutilizable para convertir binarios en Data URI
+    def a_data_uri(binario, default_url):
+        if binario:
+            mime = obtener_mime_sin_imghdr(binario)
+            base64_str = base64.b64encode(binario).decode('utf-8')
+            return f"data:{mime};base64,{base64_str}"
+        return default_url
+
+    portada_uri = a_data_uri(portada_bin, "https://via.placeholder.com/200x200?text=No+Portada")
+    presentacion_uri = a_data_uri(presentacion_bin, "https://via.placeholder.com/200x200?text=No+Presentacion")
+
+    # Obtener temporadas del anime
+    cursor.execute("""
+        SELECT id, titulo, portada 
+        FROM temporada 
+        WHERE anime_id = %s 
+        ORDER BY fecha_estreno
+    """, (id,))
     temporadas_raw = cursor.fetchall()
 
     temporadas = []
     for temp_id, temp_titulo, temp_portada_bin in temporadas_raw:
-        temp_portada = (
-            f"data:image/jpeg;base64,{base64.b64encode(temp_portada_bin).decode('utf-8')}"
-            if temp_portada_bin else
-            "https://via.placeholder.com/50x50?text=No+Imagen"
-        )
+        temp_portada_uri = a_data_uri(temp_portada_bin, "https://via.placeholder.com/150x200?text=No+Imagen")
 
-        # Obtener capítulos para la temporada actual
+        # Obtener capítulos de la temporada
         cursor.execute("""
-            SELECT id, numero_capitulo, titulo, link
-            FROM capitulo
-            WHERE temporada_id = %s
+            SELECT id, numero_capitulo, titulo, link 
+            FROM capitulo 
+            WHERE temporada_id = %s 
             ORDER BY numero_capitulo
         """, (temp_id,))
         caps = cursor.fetchall()
+
         capitulos = [{
             'id': c[0],
             'numero': c[1],
@@ -510,25 +539,28 @@ def ver_capitulos_anime(id):
         temporadas.append({
             'id': temp_id,
             'titulo': temp_titulo,
-            'portada': temp_portada,
+            'portada': temp_portada_uri,
             'capitulos': capitulos
         })
 
     cursor.close()
     conn.close()
 
-    return render_template('sitio/ver_capitulos_anime.html', anime={
-        'id': id,
-        'titulo': titulo,
-        'descripcion': descripcion,
-        'portada': portada,
-        'temporadas': temporadas
-    })
+    return render_template('sitio/ver_capitulos_anime.html',
+                           anime={
+                               'id': id,
+                               'titulo': titulo,
+                               'descripcion': descripcion,
+                               'portada_uri': portada_uri,
+                               'imagen_presentacion_uri': presentacion_uri,
+                               'temporadas': temporadas,
+                               'fecha_estrenos': fecha_estreno,
+                               'generos':genero
+                           },random=random)
 
 
 
-
-#CREAR CAPITULO
+# CREAR CAPITULO
 @app.route('/admin/capitulo/nuevo', methods=['GET', 'POST'])
 def crear_capitulo():
     conn = get_db_connection()
@@ -552,14 +584,21 @@ def crear_capitulo():
         duracion = request.form['duracion']
         link = request.form['link']
 
-        cursor.execute("""
-            INSERT INTO capitulo (temporada_id, numero_capitulo, titulo, descripcion, fecha_emision, duracion, link)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (temporada_id, numero_capitulo, titulo, descripcion, fecha_emision, duracion, link))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return redirect(url_for('crear_capitulo'))
+        try:
+            cursor.execute("""
+                INSERT INTO capitulo (temporada_id, numero_capitulo, titulo, descripcion, fecha_emision, duracion, link)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (temporada_id, numero_capitulo, titulo, descripcion, fecha_emision, duracion, link))
+
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            print("Error al insertar el capítulo:", e)
+        finally:
+            cursor.close()
+            conn.close()
+
+        return redirect(url_for('ver_capitulos'))  # Aquí rediriges a la lista
 
     cursor.close()
     conn.close()
@@ -611,26 +650,23 @@ def editar_capitulo(id):
 @app.route('/admin/crear_temporada', methods=['GET', 'POST'])
 def crear_temporada():
     if request.method == 'POST':
-        # Lógica para crear temporada
         anime_id = request.form['anime_id']
         numero_temporada = request.form['numero_temporada']
         titulo = request.form['titulo']
         fecha_estreno = request.form['fecha_estreno']
         portada = request.files['portada']
 
-        # Guardar los datos en la base de datos (suponiendo que tengas la lógica correcta para esto)
-
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO temporada (anime_id, numero_temporada, titulo, fecha_estreno, portada)
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s)
         ''', (anime_id, numero_temporada, titulo, fecha_estreno, portada.read()))
         conn.commit()
         cursor.close()
         conn.close()
 
-        return redirect(url_for('ver_temporadas'))  # Redirige a la vista de lista de temporadas
+        return redirect(url_for('ver_temporadas'))
 
     # Obtener la lista de animes para el formulario
     conn = get_db_connection()
@@ -642,12 +678,11 @@ def crear_temporada():
 
     return render_template('admin/crear_temporada.html', animes=animes)
 
-
-#EDITAR TEMPORADA
+#Editar Temporada
 @app.route('/admin/temporada/editar/<int:id>', methods=['GET', 'POST'])
 def editar_temporada(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
 
     if request.method == 'POST':
         anime_id = request.form['anime_id']
@@ -660,14 +695,14 @@ def editar_temporada(id):
             portada_data = portada_file.read()
             cursor.execute('''
                 UPDATE temporada
-                SET anime_id = ?, numero_temporada = ?, titulo = ?, fecha_estreno = ?, portada = ?
-                WHERE id = ?
+                SET anime_id = %s, numero_temporada = %s, titulo = %s, fecha_estreno = %s, portada = %s
+                WHERE id = %s
             ''', (anime_id, numero_temporada, titulo, fecha_estreno, portada_data, id))
         else:
             cursor.execute('''
                 UPDATE temporada
-                SET anime_id = ?, numero_temporada = ?, titulo = ?, fecha_estreno = ?
-                WHERE id = ?
+                SET anime_id = %s, numero_temporada = %s, titulo = %s, fecha_estreno = %s
+                WHERE id = %s
             ''', (anime_id, numero_temporada, titulo, fecha_estreno, id))
 
         conn.commit()
@@ -676,15 +711,13 @@ def editar_temporada(id):
         return redirect(url_for('ver_temporadas'))
 
     # GET: datos de temporada
-    cursor.execute('SELECT * FROM temporada WHERE id = ?', (id,))
-    row = cursor.fetchone()
-    if not row:
+    cursor.execute('SELECT * FROM temporada WHERE id = %s', (id,))
+    temporada = cursor.fetchone()
+
+    if not temporada:
         cursor.close()
         conn.close()
         return "Temporada no encontrada", 404
-
-    col_names = [col[0] for col in cursor.description]
-    temporada = dict(zip(col_names, row))
 
     portada_uri = (
         f"data:image/jpeg;base64,{base64.b64encode(temporada['portada']).decode('utf-8')}"
@@ -694,8 +727,6 @@ def editar_temporada(id):
 
     cursor.execute('SELECT id, titulo FROM Anime ORDER BY titulo')
     animes = cursor.fetchall()
-    col_names = [col[0] for col in cursor.description]
-    animes = [dict(zip(col_names, a)) for a in animes]
 
     cursor.close()
     conn.close()

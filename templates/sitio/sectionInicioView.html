@@ -1,0 +1,259 @@
+
+ <!-- Sección Principal -->
+ <section class="inicio position-relative overflow-hidden">
+    <!-- Aquí reemplazamos la URL de la imagen con la proporcionada -->
+    <img src="{{ anime.portada_uri}}" alt="Imagen de inicio" id="Imagenportada" class="imagen-inicio">
+
+</section>
+
+<div class=" borde-parcial presentacion borde-inferior-parcial container my-5 p-4 bg-dark text-light rounded shadow-lg">
+    <!-- Título + etiquetas -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+      <h1 class="display-6 mb-2 mb-md-0">{{ anime.titulo}}</h1>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="badge bg-info text-dark">{{ anime.generos }}</span>
+        <span class="badge bg-primary">23 min </span>
+        <span class="badge bg-light text-dark">Idioma: Latino</span>
+      </div>
+    </div>
+  
+    <!-- Contenido -->
+    <div class="row g-4">
+      <!-- Portada -->
+      <div class="col-md-3 text-center">
+        <img src="{{ anime.imagen_presentacion_uri }}" alt="{{anime.titulo }}" class="img-fluid rounded shadow-sm"
+          style="max-height: 250px; object-fit: cover;">
+      </div>
+      <!-- Descripción y detalles -->
+      <div class="col-md-6">
+        <p class="mb-1"><strong>Director:</strong> {{ anime.titulo }}</p>
+        <p class="mb-1"><strong>Fecha de estreno:</strong> {{ anime.fecha_estrenos }}</p>
+        <p class="mt-3">{{ anime.descripcion }}</p>
+        <div class="mt-2">
+          <span class="badge bg-secondary me-1">{{ anime.generos }}</span>
+        </div>
+      </div>
+  
+      <!-- Medidor de Puntuación (Tipo Carga Mejorado) -->
+      <div class="col-md-3 d-flex justify-content-center align-items-center pt-3">
+        <div class="circle-container">
+          <div class="circle-background"></div>
+          <div class="circle-progress"></div>
+          <div class="circle-center">
+            {{ "%.1f"|format(random.uniform(7.5, 10.0)) }}
+            <small class="text-muted" style="font-size: 0.6rem;">/ 10</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Generar un valor aleatorio entre 75 y 100
+    const puntuacion = (Math.random() * (100 - 75) + 75).toFixed(2);  // Redondear a 2 decimales
+  
+    // Establecer el valor de stroke-dasharray dinámicamente
+    document.querySelector('.circle-progress').style.strokeDasharray = `${puntuacion} 100`;
+  </script>
+<!-- Agregar Bootstrap JS y dependencias -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Obtener el color promedio de la parte inferior de la imagen
+    function getBottomColor(image) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        ctx.drawImage(image, 0, 0, image.width, image.height);
+        const imageData = ctx.getImageData(0, canvas.height * 0.9, canvas.width, canvas.height * 0.1);
+
+        let r = 0, g = 0, b = 0;
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+        }
+
+        const pixelCount = data.length / 4;
+        r = Math.floor(r / pixelCount);
+        g = Math.floor(g / pixelCount);
+        b = Math.floor(b / pixelCount);
+
+        return { r, g, b };
+    }
+
+    // Calcular el brillo para decidir si el texto será blanco o negro
+    function getBrightness(r, g, b) {
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    }
+
+    // Esperar que cargue la imagen para leer sus colores
+    window.addEventListener('load', () => {
+        const image = document.querySelector('.imagen-inicio');
+        if (!image) return;
+
+        // Asegura que la imagen esté completamente cargada
+        image.onload = () => {
+            const color = getBottomColor(image);
+            const brightness = getBrightness(color.r, color.g, color.b);
+            const textColor = brightness > 128 ? 'black' : 'white';
+
+            // Aplicar solo el color del texto
+            document.body.style.color = textColor;
+        };
+
+        // Si ya está cargada
+        if (image.complete) {
+            const color = getBottomColor(image);
+            const brightness = getBrightness(color.r, color.g, color.b);
+            const textColor = brightness > 128 ? 'black' : 'white';
+            document.body.style.color = textColor;
+        }
+    });
+</script>
+<style>
+    .borde-parcial ,.borde-inferior-parcial {
+      position: relative;
+    }
+    
+    /* Borde superior parcial */
+    .borde-parcial::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 2px;
+      width: 60%; /* Aquí controlas qué parte del borde se pinta */
+      background-color: white;
+    }
+    /* Borde inferior parcial */
+    .borde-inferior-parcial::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      height: 2px;        /* Grosor del "borde" */
+      width: 60%;         /* Solo el 15% del ancho se pinta */
+      background-color: white;
+    }
+    
+    
+      </style>
+<style>
+
+   
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body, html {
+        height: 100%;
+        font-family: Arial, sans-serif;
+        transition: background-color 0.1s linear, color 0.1s linear; /* Suaviza la transición del color */
+        background-color: var(--bg-color);
+    }
+
+    .inicio {
+        height: 70vh;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        filter: contrast(1);
+    }
+
+    .imagen-inicio {
+        width: 100%;
+        height: 600px;
+        max-height: 100%;
+        object-fit: fill;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+    /* Estilo adicional para hacer que la sección principal ocupe toda la altura de la ventana */
+    .inicio {
+        height: 70vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    @media (max-width: 767px) {
+    #Imagenportada {
+        height: auto !important;
+        object-fit: cover;
+    }
+    .inicio{
+        height: 30vh !important;
+    }
+}
+</style>
+<!-- Estilos para el Medidor de Carga Mejorado -->
+<style>
+    .presentacion {
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+    /* Contenedor para el círculo de carga */
+    .circle-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: transparent;
+    }
+    :root {
+  --bg-color: #0f151c;
+  --text-color: #ffffff;
+  --accent-color: #0058d4;
+  --font-family: "Open Sans", sans-serif;
+}
+    /* Fondo del círculo */
+    .circle-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: var(--bg-color);
+    }
+    .text-muted{
+        color: var(--text-color) !important;
+    }
+  
+    /* Progreso del círculo (borde que se llena) */
+    .circle-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 10px solid transparent;
+      border-top: 10px solid #facc15; /* Color del progreso */
+      transform: rotate(-90deg); /* Iniciar desde el 0% */
+      transform-origin: 50% 50%;
+      transition: stroke-dasharray 1s ease-out;
+    }
+  
+    /* Texto centrado en el círculo */
+    .circle-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #facc15;
+      text-align: center;
+    }
+  </style>

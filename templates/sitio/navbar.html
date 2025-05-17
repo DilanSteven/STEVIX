@@ -116,3 +116,74 @@ body {
     });
   });
 </script>
+<!--BUSCADOR -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('buscador');
+    const resultadosDiv = document.getElementById('resultadosBusqueda');
+    const spinner = document.getElementById('spinner');
+
+    if (!input) return;
+
+    input.addEventListener('keyup', function () {
+      const query = input.value.trim();
+
+      if (query.length === 0) {
+        resultadosDiv.innerHTML = '';
+        spinner.style.display = 'none';
+        return;
+      }
+
+      resultadosDiv.innerHTML = '';
+      spinner.style.display = 'block';
+
+      fetch(`/api/buscar-animes?titulo=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+          spinner.style.display = 'none';
+
+          if (data.length === 0) {
+            resultadosDiv.innerHTML = '<h5 class="text-light text-center">No se encontraron resultados.</h5>';
+            return;
+          }
+
+          let html = '<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">';
+          data.forEach(item => {
+            const url = item.tipo === 'pelicula'
+              ? `/pelicula/${item.id}`
+              : `/anime/${item.id}/ver_capitulos`;
+
+            html += `
+              <div class="col">
+                <div class="card h-100 bg-dark text-white border-0 shadow">
+                  <img src="${item.portada}" class="card-img-top" alt="${item.titulo}" style="height: 350px; object-fit: cover;">
+                  <div class="card-body">
+                    <h5 class="card-title">${item.titulo}</h5>
+                    <p class="card-text">${item.descripcion || "Descripción no disponible"}</p>
+                  </div>
+                  <div class="card-footer bg-transparent border-0">
+                    <a href="${url}" class="btn btn-outline-light w-100">Ver más</a>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          html += '</div>';
+          resultadosDiv.innerHTML = html;
+        })
+        .catch(error => {
+          spinner.style.display = 'none';
+          resultadosDiv.innerHTML = '<h5 class="text-danger text-center">Ocurrió un error al buscar.</h5>';
+          console.error(error);
+        });
+    });
+  });
+</script>
+
+<!-- Spinner de carga -->
+<div id="spinner" class="text-center mt-4" style="display: none;">
+  <div class="spinner-border text-light" role="status">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+<div id="resultadosBusqueda" class="container mt-4">

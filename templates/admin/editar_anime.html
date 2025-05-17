@@ -39,40 +39,34 @@
     </div>
 
     <!-- Mostrar portada actual -->
-    <div class="mb-3">
-      <label for="portada" class="form-label">Portada Actual:</label><br>
-      {% if temporada['portada'] %}
-        <img src="{{ temporada['portada'] }}" alt="Portada Actual" class="img-fluid" style="max-width: 200px;">
-      {% else %}
-        <p>No hay portada actual.</p>
-      {% endif %}
-    </div>
+<!-- Mostrar portada actual -->
+<div class="mb-3">
+  <label for="portada" class="form-label">Portada Actual:</label><br>
+  <img src="{{ portada_uri }}" alt="Portada Actual" class="img-fluid" style="max-width: 200px;">
+</div>
 
-    <!-- Campo para subir nueva portada con previsualización -->
-    <div class="mb-3">
-      <label for="portada" class="form-label">Portada (opcional):</label>
-      <input type="file" name="portada" id="portada" class="form-control" onchange="previsualizarImagen(this, 'portadaPreview')">
-      <br>
-      <img id="portadaPreview" src="#" alt="Vista Previa de la Portada" style="max-width: 200px; display: none;">
-    </div>
+<!-- Campo para subir nueva portada con previsualización -->
+<div class="mb-3">
+  <label for="portada" class="form-label">Portada (opcional):</label>
+  <input type="file" name="portada" id="portada" class="form-control" onchange="previsualizarImagen(this, 'portadaPreview')">
+  <br>
+  <img id="portadaPreview" src="#" alt="Vista Previa de la Portada" style="max-width: 200px; display: none;">
+</div>
 
-    <!-- Mostrar imagen de presentación actual -->
-    <div class="mb-3">
-      <label for="imagen_presentacion" class="form-label">Imagen de Presentación Actual:</label><br>
-      {% if temporada['imagen_presentacion'] %}
-        <img src="{{ temporada['imagen_presentacion'] }}" alt="Imagen de Presentación Actual" class="img-fluid" style="max-width: 200px;">
-      {% else %}
-        <p>No hay imagen de presentación actual.</p>
-      {% endif %}
-    </div>
+<!-- Mostrar imagen de presentación actual -->
+<div class="mb-3">
+  <label for="imagen_presentacion" class="form-label">Imagen de Presentación Actual:</label><br>
+  <img src="{{ imagen_presentacion_uri }}" alt="Imagen de Presentación Actual" class="img-fluid" style="max-width: 200px;">
+</div>
 
-    <!-- Campo para subir nueva imagen de presentación con previsualización -->
-    <div class="mb-3">
-      <label for="imagen_presentacion" class="form-label">Imagen de Presentación (opcional):</label>
-      <input type="file" name="imagen_presentacion" id="imagen_presentacion" class="form-control" onchange="previsualizarImagen(this, 'imagenPresentacionPreview')">
-      <br>
-      <img id="imagenPresentacionPreview" src="#" alt="Vista Previa de la Imagen de Presentación" style="max-width: 200px; display: none;">
-    </div>
+<!-- Campo para subir nueva imagen de presentación con previsualización -->
+<div class="mb-3">
+  <label for="imagen_presentacion" class="form-label">Imagen de Presentación (opcional):</label>
+  <input type="file" name="imagen_presentacion" id="imagen_presentacion" class="form-control" onchange="previsualizarImagen(this, 'imagenPresentacionPreview')">
+  <br>
+  <img id="imagenPresentacionPreview" src="#" alt="Vista Previa de la Imagen de Presentación" style="max-width: 200px; display: none;">
+</div>
+
 
     <!-- Botón para guardar cambios -->
     <button type="submit" class="btn btn-success">Actualizar Anime</button>
@@ -165,5 +159,21 @@
     }
   }
 </style>
-
+<script>
+  function previsualizarImagen(input, idPreview) {
+    const preview = document.getElementById(idPreview);
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      }
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      preview.src = '#';
+      preview.style.display = 'none';
+    }
+  }
+  </script>
+  
 {% include 'admin/footer.html' %}

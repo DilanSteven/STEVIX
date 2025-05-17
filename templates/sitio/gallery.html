@@ -1,0 +1,97 @@
+<!-- Título de la galería -->
+<div class="row mt-5">
+    <br>
+    <div class="col text-center">
+      <h5 class="display-6 mb-2 mb-md-0">Galería</h5>
+      <h5 class="display-6 mb-2 mb-md-0" id="movieTitle">{{ anime.titulo }}</h5>
+      <br>
+    </div>
+  </div>
+  
+  <!-- Contenedor de la Galería -->
+  <div id="gallery" class="container px-3">
+    <div class="row" id="galleryRow">
+      <!-- Las imágenes se cargarán aquí dinámicamente -->
+    </div>
+  </div>
+  
+  <!-- Script para cargar la galería desde TMDb -->
+  <script>
+    const movieTitle = document.getElementById('movieTitle').textContent.trim();
+    const TMDB_API_KEY = '13f0fb6807cf21534fc362fadb71b464'; // Tu clave de TMDb
+  
+    function generateImagesFromAPI() {
+      const galleryRow = document.getElementById('galleryRow');
+  
+      fetch(`https://api.themoviedb.org/3/search/movie?query=${movieTitle}&api_key=${TMDB_API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+          const movie = data.results[0];
+          if (!movie) {
+            galleryRow.innerHTML = '<p>No se encontró la película.</p>';
+            return;
+          }
+          const movieId = movie.id;
+  
+          fetch(`https://api.themoviedb.org/3/movie/${movieId}/images?api_key=${TMDB_API_KEY}`)
+            .then(response => response.json())
+            .then(data => {
+              const images = data.backdrops;
+              if (images && images.length > 0) {
+                images.slice(0, 9).forEach(image => {
+                  const galleryItem = document.createElement('div');
+                  galleryItem.classList.add('col-lg-4', 'col-md-4', 'col-sm-6', 'col-12', 'mb-3');
+  
+                  const itemContent = `
+                    <div class="gallery-item">
+                      <img class="img-fluid" src="https://image.tmdb.org/t/p/w500${image.file_path}" alt="Escena">
+                    </div>
+                  `;
+  
+                  galleryItem.innerHTML = itemContent;
+                  galleryRow.appendChild(galleryItem);
+                });
+              } else {
+                galleryRow.innerHTML = '<p>No se encontraron imágenes para esta película.</p>';
+              }
+            })
+            .catch(error => console.log('Error al cargar las imágenes:', error));
+        })
+        .catch(error => console.log('Error al buscar la película:', error));
+    }
+  
+    generateImagesFromAPI();
+  </script>
+  
+  <!-- Estilos de la galería -->
+  <style>
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+  
+    .gallery-item img:hover {
+      transform: scale(1.03);
+    }
+  
+    @media (max-width: 768px) {
+      .gallery-item img {
+        max-height: 200px;
+        object-fit: cover;
+      }
+    }
+  
+    @media (max-width: 576px) {
+      .gallery-item img {
+        max-height: 150px;
+      }
+    }
+  
+    .gallery-item {
+      padding: 0.5rem;
+    }
+  </style>
+  
