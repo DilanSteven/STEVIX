@@ -1,7 +1,5 @@
 # conexion.py
 import psycopg2
-
-import psycopg2
 import os
 
 # Puedes controlar esto con una variable de entorno, por defecto usará "render"

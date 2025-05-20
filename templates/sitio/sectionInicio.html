@@ -9,8 +9,9 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 <script>
-    // Función para obtener el color de los píxeles de la parte inferior de la imagen
+    // Obtener el color promedio de la parte inferior de la imagen
     function getBottomColor(image) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -18,7 +19,7 @@
         canvas.height = image.height;
         ctx.drawImage(image, 0, 0, image.width, image.height);
         const imageData = ctx.getImageData(0, canvas.height * 0.9, canvas.width, canvas.height * 0.1);
-        
+
         let r = 0, g = 0, b = 0;
         const data = imageData.data;
         for (let i = 0; i < data.length; i += 4) {
@@ -35,38 +36,33 @@
         return { r, g, b };
     }
 
-    // Función para calcular el brillo del color
+    // Calcular el brillo para decidir si el texto será blanco o negro
     function getBrightness(r, g, b) {
-        return 0.2126 * r + 0.7152 * g + 0.0722 * b; // Fórmula de luminancia
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
     }
 
-    // Función para actualizar el color de fondo y el color de la letra al hacer scroll
-    window.addEventListener('scroll', () => {
+    // Esperar que cargue la imagen para leer sus colores
+    window.addEventListener('load', () => {
         const image = document.querySelector('.imagen-inicio');
-        const scrollPosition = window.scrollY;
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        const percentageScrolled = scrollPosition / maxScroll;
+        if (!image) return;
 
-        const color = getBottomColor(image);
-        const brightness = getBrightness(color.r, color.g, color.b);
+        // Asegura que la imagen esté completamente cargada
+        image.onload = () => {
+            const color = getBottomColor(image);
+            const brightness = getBrightness(color.r, color.g, color.b);
+            const textColor = brightness > 128 ? 'black' : 'white';
 
-        const darknessFactor = Math.min(1, percentageScrolled + 0.9);
-        const r = Math.floor(color.r * (1 - darknessFactor * 0.7) + 5);
-        const g = Math.floor(color.g * (1 - darknessFactor * 0.7));
-        const b = Math.floor(color.b * (1 - darknessFactor * 0.7) - 5);
+            // Aplicar solo el color del texto
+            document.body.style.color = textColor;
+        };
 
-        // Calculamos el color de texto según el brillo del fondo
-        const textColor = brightness > 128 ? 'black' : 'white';
-
-        document.body.style.background = `rgb(${r}, ${g}, ${b})`;
-
-        // Cambiar color de texto
-        document.body.style.color = textColor;
-
-        const gradient = `linear-gradient(to bottom, rgba(${r}, ${g}, ${b}, 0.8) 80%, transparent 100%)`;
-
-        document.querySelector('.imagen-inicio').style.maskImage = gradient;
-        document.querySelector('.imagen-inicio').style.webkitMaskImage = gradient;
+        // Si ya está cargada
+        if (image.complete) {
+            const color = getBottomColor(image);
+            const brightness = getBrightness(color.r, color.g, color.b);
+            const textColor = brightness > 128 ? 'black' : 'white';
+            document.body.style.color = textColor;
+        }
     });
 </script>
 <style>

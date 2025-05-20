@@ -1,18 +1,40 @@
 {% include 'sitio/navbar.html' %}
 {% include 'sitio/sectionInicioView.html' %}
 <head>
-<!-- Agregar jQuery, Popper.js y Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Agregar jQuery, Popper.js y Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <!-- Estilo para scroll condicional -->
+  <style>
+    .scrollable-chapters {
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    .scrollable-chapters::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .scrollable-chapters::-webkit-scrollbar-thumb {
+      background-color: #555;
+      border-radius: 4px;
+    }
+
+    .scrollable-chapters::-webkit-scrollbar-track {
+      background-color: #2a2a2a;
+    }
+  </style>
 </head>
+
 <!--Estilo Card de descripcion e informacion-->
 <div class="col text-center">
   <h2 class="text-center mb-4" style="font-weight: 600; font-size: 1.8rem; color: #ffffff;">
     Ver Capítulo <span style="color: rgb(50 196 255) !important;">– Reproductor</span>
   </h2>
-
 </div>
+
 <div class="container py-5 text-light">
   <div class="row mb-4">
     <div class="row">
@@ -48,16 +70,18 @@
             <div id="collapse{{ loop.index }}" class="accordion-collapse collapse"
               aria-labelledby="heading{{ loop.index }}" data-bs-parent="#accordionTemporadas">
               <div class="accordion-body">
-                <ul class="list-group list-group-flush">
-                  {% for cap in temporada.capitulos %}
-                  <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center">
-                    <span>
-                      <strong>Cap. {{ cap.numero }}:</strong> {{ cap.titulo }}
-                    </span>
-                    <button class="btn btn-outline-light btn-sm" onclick="cargarVideo('{{ cap.link }}')">Ver</button>
-                  </li>
-                  {% endfor %}
-                </ul>
+                <div class="{% if temporada.capitulos|length > 7 %}scrollable-chapters{% endif %}">
+                  <ul class="list-group list-group-flush">
+                    {% for cap in temporada.capitulos %}
+                    <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center">
+                      <span>
+                        <strong>Cap. {{ cap.numero }}:</strong> {{ cap.titulo }}
+                      </span>
+                      <button class="btn btn-outline-light btn-sm" onclick="cargarVideo('{{ cap.link }}')">Ver</button>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -66,13 +90,17 @@
       </div>
     </div>
   </div>
+
   <script>
     function cargarVideo(link) {
       const iframe = document.getElementById('videoPlayer');
       iframe.src = link;
     }
   </script>
-  <div class=" borde-parcial presentacion borde-inferior-parcial container my-5 p-4 bg-dark text-light rounded shadow-lg">
-    {%include 'sitio/gallery.html'%}</div>
+
+  <div class="borde-parcial presentacion borde-inferior-parcial container my-5 p-4 bg-dark text-light rounded shadow-lg">
+    {% include 'sitio/gallery.html' %}
+  </div>
 </div>
-  {% include 'sitio/footer.html' %}
+
+{% include 'sitio/footer.html' %}

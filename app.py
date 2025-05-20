@@ -6,6 +6,8 @@ import base64
 import os
 import random
 import hashlib
+#IMPORTAR PELICULA
+from peliculas import listado_peliculas,crear_pelicula,editar_pelicula
 #importacion de Anime
 from anime import obtener_animes,crear_anime,editar_anime
 from proof import Obtener_Imagen_Portada
@@ -47,6 +49,21 @@ def crear_anime_route():
 @app.route('/admin/editar_anime/<int:anime_id>', methods=['GET', 'POST'])
 def editar_anime_route(anime_id):
     return editar_anime(anime_id)
+
+#Vista de Lista de Peliculas
+@app.route('/admin/lista_peliculas', methods=['GET', 'POST'])
+def ver_peliculas():
+    peliculas, search_term= listado_peliculas()
+    return render_template('admin/lista_peliculas.html', peliculas=peliculas, search_term=search_term)
+#Crear pelicula
+@app.route('/admin/peliculas/crear', methods=['GET', 'POST'])
+def crear_pelicula_route():
+    return crear_pelicula()
+#EDITAR PELICULA
+@app.route('/admin/peliculas/editar/<int:pelicula_id>', methods=['GET', 'POST'])
+def editar_pelicula_route(pelicula_id):
+    return editar_pelicula(pelicula_id)
+
 
 
 #Proof de Portada
@@ -357,42 +374,68 @@ def EditAnime(id):
         conn.close()
         return redirect(url_for('peliculas'))  # o donde quieras redirigir
 
-#Buscador
 @app.route('/')
 def index():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Últimos 10 Animes agregados en 2024
     cursor.execute("""
-        SELECT a.id, a.titulo, a.descripcion, a.portada
+        SELECT a.id, a.titulo, a.descripcion, a.imagen_presentacion, t.fecha_estreno
         FROM Anime a
         JOIN temporada t ON a.id = t.anime_id
         WHERE EXTRACT(YEAR FROM t.fecha_estreno) = 2024
-
+        ORDER BY t.fecha_estreno DESC
+        LIMIT 10
     """)
-    resultados = cursor.fetchall()
+    animes_resultados = cursor.fetchall()
+    animes2024 = [{
+        'id': row[0],
+        'titulo': row[1],
+        'descripcion': row[2],
+        'portada': f"data:image/jpeg;base64,{base64.b64encode(row[3]).decode('utf-8')}" if row[3] else "https://via.placeholder.com/300x400?text=No+Imagen"
+    } for row in animes_resultados]
 
-    animes2025 = []
-    for fila in resultados:
-        id_anime, titulo, descripcion, portada_bin = fila
-        portada = (
-            f"data:image/jpeg;base64,{base64.b64encode(portada_bin).decode('utf-8')}"
-            if portada_bin else
-            "https://via.placeholder.com/300x400?text=No+Imagen"
-        )
-        animes2025.append({
-            'id': id_anime,
-            'titulo': titulo,
-            'descripcion': descripcion,
-            'portada': portada
-        })
+    # Últimas 10 Películas agregadas
+    cursor.execute("""
+        SELECT id, titulo, descripcion, fecha_estreno, duracion, portada 
+        FROM Pelicula
+        ORDER BY id DESC
+        LIMIT 10
+    """)
+    peliculas_resultados = cursor.fetchall()
+    peliculas = [{
+        'id': row[0],
+        'titulo': row[1],
+        'descripcion': row[2],
+        'fecha_estreno': row[3],
+        'duracion': row[4],
+        'portada': f"data:image/jpeg;base64,{base64.b64encode(row[5]).decode('utf-8')}" if row[5] else "https://via.placeholder.com/300x400?text=No+Imagen"
+    } for row in peliculas_resultados]
+
+# 10 Animes aleatorios que tengan capítulos
+    cursor.execute("""
+        SELECT a.id, a.titulo, a.descripcion, a.imagen_presentacion
+        FROM Anime a
+        JOIN temporada t ON a.id = t.anime_id
+        JOIN capitulo c ON t.id = c.temporada_id
+        GROUP BY a.id, a.titulo, a.descripcion, a.imagen_presentacion
+        ORDER BY RANDOM()
+        LIMIT 10
+    """)
+    aleatorios_resultados = cursor.fetchall()
+    animes_aleatorios = [{
+        'id': row[0],
+        'titulo': row[1],
+        'descripcion': row[2],
+        'portada': f"data:image/jpeg;base64,{base64.b64encode(row[3]).decode('utf-8')}" if row[3] else "https://via.placeholder.com/300x400?text=No+Imagen"
+    } for row in aleatorios_resultados]
+
 
     cursor.close()
     conn.close()
 
-    return render_template('sitio/index.html', animes=animes2025)
-
-
+    return render_template('sitio/index.html', animes=animes2024, peliculas=peliculas, aleatorios=animes_aleatorios)
 
 @app.route('/api/buscar-animes')
 def api_buscar_animes():
@@ -931,6 +974,7 @@ def cerrar_sesion():
     session.clear()  # Elimina todos los datos de la sesión
     flash('Sesión cerrada correctamente.', 'info')
     return redirect(url_for('login'))  # Redirige al login (ajusta el nombre si tu vista tiene otro nombre)
+
 
 if __name__ =='__main__':
     app.run(debug=True)

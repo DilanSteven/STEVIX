@@ -127,14 +127,50 @@
         }
     }
 </style>
-    <!-- Galería -->
-    <div class="row mt-5">
-        <div class="col text-center">
-          <h5 class="display-6 mb-2 mb-md-0">Galería</h5>
-          <h5 class="display-6 mb-2 mb-md-0" id="movieTitle">{{ pelicula['titulo'] }}</h5>
-          <br>
+<!--Ver Pelicula-->
+  <div class=" container my-5 ver-pelicula-section">
+    <!-- Título estilizado -->
+<!--Estilo Card de descripcion e informacion-->
+<div class="col text-center">
+  <br>
+  <h2 class="text-center mb-4" style="font-weight: 600; font-size: 1.8rem; color: #ffffff;">
+    Ver Capítulo <span style="color: rgb(50 196 255) !important;">– Reproductor</span>
+  </h2>
+
+</div>
+  
+    <div class="row align-items-center g-4 contenedor-video rounded-4 p-3">
+      
+      <!-- Video a la izquierda -->
+      <div class="col-lg-8">
+        <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow">
+          <iframe
+            src="{{ pelicula['link'] }}"
+            allowfullscreen
+            loading="lazy"
+            class="border-0"
+          ></iframe>
         </div>
       </div>
+  
+      <!-- Imagen a la derecha -->
+      <div class="col-lg-4 text-center">
+        <img
+          src="/static/images/moxie.png"
+          alt="Poster Película"
+          class="img-fluid img-sin-fondo "
+        >
+      </div>
+  
+    </div>
+  </div>
+    <!-- Galería -->
+    <div style="color: #ffffff;" class="borde-parcial col text-center">
+      <br>
+      <h5 class="display-6 mb-2 mb-md-0">Galería</h5>
+      <h5 class="display-6 mb-2 mb-md-0" id="movieTitle">{{ pelicula.titulo }}</h5>
+      <br>
+    </div>
 
 <!-- Contenedor de la Galería -->
 <div id="gallery" class="container">
@@ -270,39 +306,7 @@
   
   
 
-  <div class="borde-parcial container my-5 ver-pelicula-section">
-    <!-- Título estilizado -->
-    <div class="text-center mb-4">
-        <br>
-      <h3 class="fw-bold text-accent">🎬 Ver Película</h3>
-      <hr class="hr-accent mx-auto">
-    </div>
-  
-    <div class="row align-items-center g-4 contenedor-video rounded-4 p-3">
-      
-      <!-- Video a la izquierda -->
-      <div class="col-lg-8">
-        <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow">
-          <iframe
-            src="{{ pelicula['link'] }}"
-            allowfullscreen
-            loading="lazy"
-            class="border-0"
-          ></iframe>
-        </div>
-      </div>
-  
-      <!-- Imagen a la derecha -->
-      <div class="col-lg-4 text-center">
-        <img
-          src="/static/images/moxie.png"
-          alt="Poster Película"
-          class="img-fluid img-sin-fondo "
-        >
-      </div>
-  
-    </div>
-  </div>
+
   
   
 <style>

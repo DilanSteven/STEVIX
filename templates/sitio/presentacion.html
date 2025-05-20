@@ -1,0 +1,152 @@
+<!-- Sección de Presentación -->
+<section class="hero-section">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1 class="hero-title">STEVIX</h1>
+      <h2 class="hero-subtitle">El universo de películas, series y anime en un solo lugar</h2>
+      <p class="hero-description">
+        Bienvenido a <strong>STEVIX</strong>, tu plataforma definitiva para ver <span>películas</span>, <span>animes</span> y <span>series</span> en línea. 
+        Explora nuevos mundos, revive clásicos y descubre lo mejor del entretenimiento visual.
+      </p>
+      <a href="#ultimas-peliculas" class="hero-button">🎬 Explora ahora</a>
+    </div>
+    <div class="hero-image">
+      <img src="/static/images/LogoPresentacion-removebg-preview.png" alt="Presentación STEVIX">
+    </div>
+  </div>
+</section>
+
+<style>
+  :root {
+    --bg-color: #0f151c;
+    --text-color: #ffffff;
+    --accent-color: #0058d4;
+    --font-family: "Open Sans", sans-serif;
+  }
+
+  .hero-section {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 4rem 2rem;
+    font-family: var(--font-family);
+  }
+
+  .hero-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-text {
+    flex: 1 1 400px;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, #00bfff, #0058d4, #00bfff);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-move 4s ease infinite;
+    text-shadow: 0 0 10px rgba(0, 88, 212, 0.7);
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+  }
+
+  @keyframes gradient-move {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+    color: #cccccc;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+  }
+
+  .hero-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+  }
+
+  .hero-description span {
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+
+  .hero-button {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+  }
+
+  .hero-button:hover {
+    background-color: #003a91;
+  }
+
+  .hero-image {
+    flex: 1 1 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hero-image img {
+    max-width: 320px;
+    width: 100%;
+    filter: drop-shadow(0 0 4px var(--accent-color));
+    transition: transform 0.3s ease;
+
+  }
+
+  .hero-image img:hover {
+    transform: scale(1.03);
+  }
+
+  /* Responsive para móvil */
+  @media (max-width: 768px) {
+    .hero-content {
+      flex-direction: column-reverse;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-size: 2.8rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+    }
+
+    .hero-description {
+      font-size: 1rem;
+    }
+
+    .hero-button {
+      font-size: 0.95rem;
+      padding: 0.7rem 1.5rem;
+    }
+
+    .hero-image img {
+      max-width: 250px;
+    }
+  }
+</style>

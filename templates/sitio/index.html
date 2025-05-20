@@ -1,23 +1,135 @@
 {% include 'sitio/navbar.html' %}
+{% include 'sitio/presentacion.html' %}
 
+<style>
 
+  h2 {
+    border-left: 5px solid #00c3ff;
+    padding-left: 12px;
+    font-weight: bold;
+    animation: fadeIn 1s ease;
+  }
 
-<!-- Sección Estrenos 2025 -->
-<div id="estrenos2025" class="container py-5">
-  <h2 class="text-light mb-4">Animes estrenados en 2025</h2>
+  .card {
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 15px;
+  }
 
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(7, 196, 255, 0.4);
+  }
+
+  .badge-new {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ff4081;
+    color: white;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 5px;
+  }
+
+  .description {
+    font-size: 0.9rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+  }
+
+  .btn-bg {
+    border: 1px solid #00c3ff !important;
+    color: #00c3ff;
+    transition: all 0.3s ease;
+  }
+
+  .btn-bg:hover {
+    background-color: #00c3ff !important;
+    color: #000 !important;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+<!-- Sección Animes Aleatorios -->
+<div class="container py-5">
+  <h2 class="text-light mb-4">🎲 Animes Recomendados</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+    {% for anime in aleatorios %}
+    <div class="col">
+      <div class="card h-100 bg-dark text-white border-0 shadow">
+        <img src="{{ anime.portada }}" class="card-img-top" alt="{{ anime.titulo }}"
+          style="height: 220px; object-fit: cover;">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ anime.titulo }}</h5>
+          <p class="card-text description">
+            {{ anime.descripcion[:100] ~ '...' if anime.descripcion and anime.descripcion|length > 100 else anime.descripcion }}
+          </p>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a href="{{ url_for('ver_capitulos_anime', id=anime.id) }}" class="btn-bg btn btn-outline-success w-100">
+            🎥 Ver Capítulos
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Últimos Animes Agregados -->
+<div class="container py-5">
+  <h2 class="text-light mb-4">✨ Últimos Animes Agregados</h2>
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
     {% for anime in animes %}
     <div class="col">
       <div class="card h-100 bg-dark text-white border-0 shadow">
+        <span class="badge-new">Nuevo</span>
         <img src="{{ anime.portada }}" class="card-img-top" alt="{{ anime.titulo }}"
-          style="height: 350px; object-fit: cover;">
-        <div class="card-body">
+          style="height: 220px; object-fit: cover; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+        <div class="card-body d-flex flex-column">
           <h5 class="card-title">{{ anime.titulo }}</h5>
-          <p class="card-text">{{ anime.descripcion if anime.descripcion else "Descripción no disponible" }}</p>
+          <p class="card-text description">
+            {{ anime.descripcion if anime.descripcion else "Sin descripción disponible." }}
+          </p>
         </div>
         <div class="card-footer bg-transparent border-0">
-          <a href="{{ url_for('ViewPeli', id=anime.id) }}" class="btn btn-outline-light w-100">Ver más</a>
+          <a href="{{ url_for('ver_capitulos_anime', id=anime.id) }}" class="btn btn-bg w-100">
+            📺 Ver Capítulos
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Últimas Películas Agregadas -->
+<div id="ultimas-peliculas" class="container py-5">
+  <h2 class="text-light mb-4">🎬 Últimas Películas Agregadas</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+    {% for peli in peliculas %}
+    <div class="col">
+      <div class="card h-100 bg-dark text-white border-0 shadow">
+        <span class="badge-new">Nuevo</span>
+        <img src="{{ peli.portada }}" class="card-img-top" alt="{{ peli.titulo }}"
+          style="height: 220px; object-fit: cover;">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ peli.titulo }}</h5>
+          <p class="card-text mb-1"><strong>Fecha:</strong> {{ peli.fecha_estreno }}</p>
+          <p class="card-text mb-2"><strong>Duración:</strong> {{ peli.duracion }} min</p>
+          <p class="card-text description">{{ peli.descripcion if peli.descripcion else "Sin descripción disponible." }}</p>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a href="{{ url_for('ViewPeli', id=peli.id) }}" class="btn btn-bg w-100">
+            🎬 Ver Película
+          </a>
         </div>
       </div>
     </div>
@@ -27,8 +139,6 @@
 
 <!-- Resultados de búsqueda -->
 <div id="resultadosBusqueda" class="container mt-4"></div>
-
-
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -64,13 +174,14 @@
             html += `
               <div class="col">
                 <div class="card h-100 bg-dark text-white border-0 shadow">
-                  <img src="${item.portada}" class="card-img-top" alt="${item.titulo}" style="height: 350px; object-fit: cover;">
+                  <span class="badge-new">Nuevo</span>
+                  <img src="${item.portada}" class="card-img-top" alt="${item.titulo}" style="height: 220px; object-fit: cover;">
                   <div class="card-body">
                     <h5 class="card-title">${item.titulo}</h5>
-                    <p class="card-text">${item.descripcion || "Descripción no disponible"}</p>
+                    <p class="card-text description">${item.descripcion || "Descripción no disponible"}</p>
                   </div>
                   <div class="card-footer bg-transparent border-0">
-                    <a href="${url}" class="btn btn-outline-light w-100">Ver más</a>
+                    <a href="${url}" class="btn btn-bg w-100">Ver más</a>
                   </div>
                 </div>
               </div>
@@ -82,7 +193,5 @@
     });
   });
 </script>
-
-
 
 {% include 'sitio/footer.html' %}
