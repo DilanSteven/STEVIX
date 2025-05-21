@@ -1,20 +1,22 @@
 {% include 'admin/navbar_lateral.html' %}
 
 <div class="container py-5">
-  <h2 class="text-light mb-4">Editar capítulo</h2>
-  <form method="POST" class="bg-dark p-4 rounded text-white">
+  <h2 class="titulo-pagina text-light mb-4">Editar capítulo</h2>
+  <form method="POST" class=" p-4 rounded text-white">
     <div class="mb-3">
       <label for="temporada_id" class="form-label">Temporada</label>
       <select name="temporada_id" class="form-select" required>
         <option value="">Selecciona una temporada</option>
         {% for t in temporadas %}
-          <option value="{{ t[0] }}" {% if t[0] == capitulo['temporada_id'] %}selected{% endif %}>{{ t[1] }} - {{ t[2] }}</option>
+        <option value="{{ t[0] }}" {% if t[0]==capitulo['temporada_id'] %}selected{% endif %}>{{ t[1] }} - {{ t[2] }}
+        </option>
         {% endfor %}
       </select>
     </div>
     <div class="mb-3">
       <label for="numero_capitulo" class="form-label">Número de Capítulo</label>
-      <input type="number" name="numero_capitulo" class="form-control" value="{{ capitulo['numero_capitulo'] }}" required>
+      <input type="number" name="numero_capitulo" class="form-control" value="{{ capitulo['numero_capitulo'] }}"
+        required>
     </div>
     <div class="mb-3">
       <label for="titulo" class="form-label">Título</label>
@@ -39,4 +41,3 @@
     <button type="submit" class="btn btn-primary">Guardar cambios</button>
   </form>
 </div>
-

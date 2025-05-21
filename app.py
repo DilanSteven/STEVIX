@@ -651,19 +651,21 @@ def crear_capitulo():
 @app.route('/admin/capitulo/editar/<int:id>', methods=['GET', 'POST'])
 def editar_capitulo(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
 
-    # Obtener capítulo actual
-    cursor.execute("SELECT * FROM capitulo WHERE id = ?", (id,))
+    # Cursor con diccionarios para el capítulo
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    cursor.execute("SELECT * FROM capitulo WHERE id = %s", (id,))
     capitulo = cursor.fetchone()
+    cursor.close()
 
-    # Obtener temporadas para el select
-    cursor.execute("""
+    # Cursor normal para temporadas (para usar t[0], t[1], t[2])
+    cursor = conn.cursor()
+    cursor.execute('''
         SELECT t.id, a.titulo, t.titulo
         FROM temporada t
-        JOIN Anime a ON t.anime_id = a.id
+        JOIN anime a ON t.anime_id = a.id
         ORDER BY a.titulo ASC, t.titulo ASC
-    """)
+    ''')
     temporadas = cursor.fetchall()
 
     if request.method == 'POST':
@@ -675,11 +677,12 @@ def editar_capitulo(id):
         duracion = request.form['duracion']
         link = request.form['link']
 
-        cursor.execute("""
+        cursor.execute('''
             UPDATE capitulo
-            SET temporada_id = ?, numero_capitulo = ?, titulo = ?, descripcion = ?, fecha_emision = ?, duracion = ?, link = ?
-            WHERE id = ?
-        """, (temporada_id, numero_capitulo, titulo, descripcion, fecha_emision, duracion, link, id))
+            SET temporada_id = %s, numero_capitulo = %s, titulo = %s,
+                descripcion = %s, fecha_emision = %s, duracion = %s, link = %s
+            WHERE id = %s
+        ''', (temporada_id, numero_capitulo, titulo, descripcion, fecha_emision, duracion, link, id))
         conn.commit()
         cursor.close()
         conn.close()
